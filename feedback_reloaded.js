@@ -1,6 +1,11 @@
+// @manu use var feedbackReloaded = {};
+// the var statement automatically "resets" the variable so it will never be set in the line below.
 var feedbackReloaded = feedbackReloaded || {};
 
 (function ($) {
+
+  // @manu use strict mode! :)
+  // "use strict";
 
 /**
  * Attach startFeedback to Feedback button
@@ -11,6 +16,7 @@ Drupal.behaviors.feedback_reloaded = {
     }
 };
 
+// @manu unless you want to initialize them, you don't need to declare these now that they're in the object.
 feedbackReloaded.d,
 feedbackReloaded.posx,
 feedbackReloaded.posy,
@@ -37,10 +43,15 @@ feedbackReloaded.getMouse = function(obj,ev) {
     else {
 		return false
     }
+
+    // @manu space your code a bit more to make it easier to read!
+
     if (ev.type == 'mousedown') {
        	feedbackReloaded.initx = feedbackReloaded.posx,
 		feedbackReloaded.inity = feedbackReloaded.posy;
-		var id = feedbackReloaded.highlighted.length;		
+
+    // @ manu careful with indentation! this entire block should be indented
+		var id = feedbackReloaded.highlighted.length;
 		$('<div id="highlight_'+id+'" class="highlighted_region" style="left:'+feedbackReloaded.initx+'px; top:'+feedbackReloaded.inity+'px;"></div>')
 		.appendTo($('body'))
 		.hover(function() {
@@ -60,7 +71,7 @@ feedbackReloaded.getMouse = function(obj,ev) {
 			.css('background-color','transparent')
 			.css('z-index','10000'+id+'')
 			.fadeTo(0, 1);
-			
+
 		  }
 		);
 		$('div[id*="highlight_"]').css("z-index", "1000");
@@ -157,17 +168,17 @@ feedbackReloaded.highlight = function(x, y, width, height) {
 	context.globalAlpha = 1;
 	context.strokeStyle = 'black';
 	context.lineWidth   = 1;
-	
+
 	//Drawing borders for already highlighted regions.
 	for(var i=feedbackReloaded.highlighted.length-1;i>=0;--i) {
 		if(feedbackReloaded.highlighted[i].active == 1) {
 			context.strokeRect(feedbackReloaded.highlighted[i].left-0.5, feedbackReloaded.highlighted[i].top-0.5, feedbackReloaded.highlighted[i].width+1, feedbackReloaded.highlighted[i].height+1);
 		}
 	}
-	
+
 	//Drawing border for this current rectangle.
 	context.strokeRect(x-0.5,y-0.5,width+1,height+1);
-	
+
 	//Clearing the regions as in highlighted array.
 	for(var i=feedbackReloaded.highlighted.length-1;i>=0;--i) {
 		if(feedbackReloaded.highlighted[i].active == 1) {
@@ -182,7 +193,7 @@ feedbackReloaded.closeHighlight = function(id) {
 	$('#cross_'+id+'').remove();
 	$('#highlight_'+id+'').remove();
 	feedbackReloaded.reRender();
-	
+
 };
 
 feedbackReloaded.restore = function(x, y, width, height) {
@@ -215,13 +226,14 @@ feedbackReloaded.reRender = function() {
 			context.clearRect(feedbackReloaded.highlighted[i].left, feedbackReloaded.highlighted[i].top, feedbackReloaded.highlighted[i].width, feedbackReloaded.highlighted[i].height);
 		}
 	}
-	
+
 };
 
 feedbackReloaded.startFeedback = function() {
 	$('body').css('overflow','hidden');
+  // @manu width and height should be 100% no?
     $('<canvas id="feedback_canvas" width=1366 height=667 class="feedback_canvas" onMouseUp="feedbackReloaded.getMouse(this,event);" onMouseDown="feedbackReloaded.getMouse(this,event);" onMouseMove="feedbackReloaded.getMouse(this,event);" ondblclick="return false;" > Your browser does not support canvas element</canvas><div id="glass" class="glass"></div>')
-    .appendTo($('body')); 
+    .appendTo($('body'));
 	var feedbackCanvas =  document.getElementById("feedback_canvas"),
 	context = feedbackCanvas.getContext('2d');
 	context.globalAlpha = 0.4;
