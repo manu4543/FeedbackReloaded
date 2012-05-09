@@ -1,0 +1,43 @@
+.feedback_button{
+	position:fixed;
+	right:20px;
+	bottom: 0px;
+	background-color: #ccc;
+	min-width: 80px;
+	min-height: 25px;
+	text-align:center;
+	vertical-align:middle;
+	border: solid 1px #999;
+	border-bottom: 0px;
+	cursor:pointer;
+	font-family: "Arial", sans-serif;
+	border-radius: 3px;
+	margin-bottom: -2px;
+	z-index:100001;
+}
+
+.highlighted_region{
+	position:fixed;
+}
+
+.cross_highlight{
+	position:fixed;
+	background-image:url(image/cross.png);
+	background-repeat: no-repeat;
+}
+
+.glass{
+	position:absolute;
+	left:0px;
+	top:0px;
+	height:100%;
+	width:100%;
+}
+
+.feedback_canvas{
+	position:fixed;
+	top:0px;
+	left:0px;
+	z-index:99999;
+	border: 0px solid black;
+}

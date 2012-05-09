@@ -1,0 +1,41 @@
+<?php
+
+
+/**
+ * Implements hook_permission().
+ */
+function feedback_reloaded_permission() {
+  return array(
+    'access feedback form' => array(
+      'title' => t('Access feedback form'),
+      'description' => t('Submit feedback messages.'),
+    ),
+    'view feedback messages' => array(
+      'title' => t('View feedback messages'),
+      'description' => t('View, process, and delete submitted feedback messages.'),
+    ),
+    'administer feedback' => array(
+      'title' => t('Administer feedback settings'),
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_init().
+ */
+function feedback_reloaded_init() {
+    $path = drupal_get_path('module', 'feedback_reloaded');
+    drupal_add_css($path . '/feedback_reloaded.css');
+    drupal_add_js($path . '/feedback_reloaded.js');
+}
+
+/**
+ * Implements hook_page_build().
+ */
+function feedback_reloaded_page_build(&$page) {
+    $page['page_bottom']['feedback'] = array(
+      '#title' => t('Feedback'),
+      '#markup' => t('<div id="feedback_button" class="feedback_button">Feedback</div>'),
+    );
+}
