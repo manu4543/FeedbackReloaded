@@ -25,17 +25,21 @@ function feedback_reloaded_permission() {
  * Implements hook_init().
  */
 function feedback_reloaded_init() {
+  if (user_access('access feedback form')) {
     $path = drupal_get_path('module', 'feedback_reloaded');
     drupal_add_css($path . '/feedback_reloaded.css');
     drupal_add_js($path . '/feedback_reloaded.js');
+  }
 }
 
 /**
  * Implements hook_page_build().
  */
 function feedback_reloaded_page_build(&$page) {
+  if (user_access('access feedback form')) {
     $page['page_bottom']['feedback'] = array(
       '#title' => t('Feedback'),
       '#markup' => t('<div id="feedback_button" class="feedback_button">Feedback</div>'),
     );
+  }
 }
