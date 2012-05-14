@@ -29,6 +29,46 @@ function feedback_reloaded_init() {
     $path = drupal_get_path('module', 'feedback_reloaded');
     drupal_add_css($path . '/feedback_reloaded.css');
     drupal_add_js($path . '/feedback_reloaded.js');
+	drupal_add_library('system', 'ui.draggable');
+    $wizardPhaseOne = <<<EOT
+	  <div id="feedback_form" class="feedback_form" onMouseMove="feedbackReloaded.getMouse(this,event);" onMouseUp="feedbackReloaded.getMouse(this,event);">
+      <div style="border-bottom: solid 1px #ccc; float: left; width: 100%; padding-bottom: 10px;">
+        <span><img src="$path/image/close.png" style="cursor: pointer; border: solid 0px #ccc; float:right;" onClick="feedbackReloaded.stopFeedback();"></span>
+	    <img src="$path/image/feedback.png" width="" height="17"  \>&nbsp;&nbsp;<span style="font-size: 17px;">Feedback Wizard</span>
+	  </div>
+	  <br style="clear: both;">
+      <div id="wizard_content">
+      <p>Welcome to the Feedback Wizard. Please start with a short description of your problem.</p>
+      <textarea style="min-height: 100px; min-width:75%; resize: none; border: solid 1px #ccc;"></textarea>
+      <p>Click Next to highlight the problem area.</p>
+      <p>You can cancel the feedback Wizard any time you want by clicking Cancel button.</p>
+      <div style="float:right; border-top: solid 1px #ccc; width: 100%;">
+        <br>
+        <button id="button_cancel" style="float:right; height: 30px;" value="Cancel" onClick="feedbackReloaded.stopFeedback();">Cancel</button>
+        <span style="float:right;">&nbsp;&nbsp;&nbsp;</span>
+        <button id="button_next" style="float:right; height: 30px;" value="Next">Next</button>
+      </div>
+	  </div>
+	  </div>  
+EOT;
+    $wizardPhaseTwo = <<<EOT
+	  <p>Click to highlight problem area<br \>
+	  <button id="button_highlight" style="height: 30px; " disabled>Highlight</button>
+	  </p>
+      <p>Click to hide personal information<br \>
+      <button id="button_blackout" style="height: 30px;">Blackout</button>
+	  </p>
+	  <div style="float:right; border-top: solid 1px #ccc; width: 100%;">
+        <br>
+        <button id="button_cancel" style="float:right; height: 30px;" value="Cancel" onClick="feedbackReloaded.stopFeedback();">Cancel</button>
+        <span style="float:right;">&nbsp;&nbsp;&nbsp;</span>
+        <button id="button_preview" style="float:right; height: 30px;" value="Next">Preview</button>
+      </div>
+	  
+EOT;
+
+  drupal_add_js(array('wizardPhaseOne' => $wizardPhaseOne), 'setting');
+  drupal_add_js(array('wizardPhaseTwo' => $wizardPhaseTwo), 'setting');
   }
 }
 

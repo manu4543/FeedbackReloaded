@@ -13,11 +13,18 @@
 	font-family: "Arial", sans-serif;
 	border-radius: 3px;
 	margin-bottom: -2px;
-	z-index:100001;
 }
 
 .highlighted_region{
+	display:block;
 	position:fixed;
+}
+
+.blackout_region{
+	position:fixed;
+	display:block;
+	background-color:black;
+	
 }
 
 .cross_highlight{
@@ -26,18 +33,40 @@
 	background-repeat: no-repeat;
 }
 
+.cross_blackout{
+	position:fixed;
+	background-image:url(image/cross.png);
+	background-repeat: no-repeat;
+}
 .glass{
-	position:absolute;
+	z-index:99997;
+	background-color: black;
+	position:fixed;
 	left:0px;
 	top:0px;
 	height:100%;
-	width:100%;
+	width:1366px;
+	opacity: 0.3;
+}
+
+.feedback_form{
+	z-index:9998889998;
+	color: #333;
+	font-size: 14px;
+	padding: 30px;
+	position: fixed;
+	bottom: 25%;
+	right: 30%;
+	background-color: white;
+	width: 40%;
+	opacity: 1.0;
+	border: solid 1px #666;
 }
 
 .feedback_canvas{
+	z-index: 99999;
 	position:fixed;
 	top:0px;
 	left:0px;
-	z-index:99999;
 	border: 0px solid black;
 }
