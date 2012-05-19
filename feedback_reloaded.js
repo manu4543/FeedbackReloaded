@@ -21,6 +21,7 @@ feedbackReloaded.posx          = 0,
 feedbackReloaded.posy          = 0;
 feedbackReloaded.highlighted   = [];
 feedbackReloaded.blackedout    = 0;
+feedbackReloaded.notes         = 0;
 feedbackReloaded.canvasIndex   = 99999; 
 feedbackReloaded.rect = function(left, top, width, height) {
   this.active = 1;
@@ -42,6 +43,52 @@ feedbackReloaded.getMouse = function(obj,ev) {
     return false
   }
   
+  if ( feedbackReloaded.currentAction == "addnote" ) {
+    if (ev.type == 'mouseup' && obj == document.getElementById("feedback_canvas")) {
+      id = feedbackReloaded.notes;
+      feedbackReloaded.initx = feedbackReloaded.posx,
+      feedbackReloaded.inity = feedbackReloaded.posy;
+      left = feedbackReloaded.initx;
+      top = feedbackReloaded.inity;
+      $('<div id="note_'+id+'" class="notes" style="left:'+left+'px; top:'+top+'px;" onMouseMove="feedbackReloaded.getMouse(this,event);" onMouseUp="feedbackReloaded.getMouse(this,event);"><textarea id="note_textarea" rows="6" cols="18"></textarea></div>')
+      .bind('keydown', function(e) {
+        if( e.keyCode !== 8 && $('#note_textarea').val().length == 108) { return false; }
+      })
+      .hover(function() {
+        $('#cross_notes_'+id+'')
+          .css('display','block');
+	    },
+        function() {
+          $('#cross_notes_'+id+'')
+            .css('display','none');
+        }
+      )
+      .appendTo($('body'));
+
+      //Appending the cross
+      left = left + 150 - 15;
+      top = top - 15;
+      $('<div id="cross_notes_'+id+'" class="cross" style="left:'+left+'px; top:'+top+'px;" ></div>')
+      .click( function() { $(this).remove(); $('#note_'+id+'').remove(); feedbackReloaded.notes--; })
+      .hover(function() {
+        $(this)
+          .css('display','block');
+	    },
+        function() {
+          $(this)
+            .css('display','none');
+        }
+      )
+      .appendTo($('body'));
+
+      $('#button_highlight', $('#feedback_form')).click();
+      feedbackReloaded.notes++;
+	}
+    feedbackReloaded.initx=false;
+    feedbackReloaded.inity=false;
+    return false;
+  }
+
   if (ev.type == 'mousedown') {
     feedbackReloaded.initx = feedbackReloaded.posx,
     feedbackReloaded.inity = feedbackReloaded.posy;
@@ -141,7 +188,7 @@ feedbackReloaded.getMouse = function(obj,ev) {
         width = height = 30;
 		id = feedbackReloaded.blackedout;
 		var zindex = "1000000000"+id;
-        $('<div id="cross_blckout_'+id+'" class="cross_highlight" style="left:'+left+'px; top:'+top+'px; width:'+width+'px; height:'+height+'px; z-index: '+zindex+'; display:none;""></div>')
+        $('<div id="cross_blckout_'+id+'" class="cross" style="left:'+left+'px; top:'+top+'px; width:'+width+'px; height:'+height+'px; z-index: '+zindex+'; display:none;""></div>')
           .hover(function() {
             $(this)
 			  .css('display','block')
@@ -190,7 +237,7 @@ feedbackReloaded.getMouse = function(obj,ev) {
         width = height = 30;
         id = feedbackReloaded.highlighted.length-1;
         var zindex = "10000"+id;
-        $('<div id="cross_'+id+'" class="cross_highlight" style="left:'+left+'px; top:'+top+'px; width:'+width+'px; height:'+height+'px; z-index: '+zindex+'; display:none;" onClick="feedbackReloaded.closeHighlight('+id+');"></div>')
+        $('<div id="cross_'+id+'" class="cross" style="left:'+left+'px; top:'+top+'px; width:'+width+'px; height:'+height+'px; z-index: '+zindex+'; display:none;" onClick="feedbackReloaded.closeHighlight('+id+');"></div>')
           .hover(function(e) {
             $(this)
               .css('display','block')
@@ -230,6 +277,7 @@ feedbackReloaded.getMouse = function(obj,ev) {
     });
   }
   
+  // This block executes if user is currently dragging mouse to draw a region
   if (feedbackReloaded.initx || feedbackReloaded.inity) {
     left   = feedbackReloaded.posx - feedbackReloaded.initx < 0 ? feedbackReloaded.posx  : feedbackReloaded.initx;
     top    = feedbackReloaded.posy - feedbackReloaded.inity < 0 ? feedbackReloaded.posy : feedbackReloaded.inity;
@@ -262,8 +310,8 @@ feedbackReloaded.highlight = function(x, y, width, height) {
   //Drawing a dimmer on whole page
   context.globalAlpha = 0.3;
   context.fillStyle   = 'black';
-  context.clearRect(0,0,1366,667);
-  context.fillRect(0,0,1366,667);
+  context.clearRect(0,0,1366,677);
+  context.fillRect(0,0,1366,677);
   context.globalAlpha = 1;
   context.strokeStyle = 'black';
   context.lineWidth   = 1;
@@ -281,8 +329,8 @@ feedbackReloaded.highlight = function(x, y, width, height) {
   //Clearing the regions as in highlighted array.
   for(var i = feedbackReloaded.highlighted.length - 1;i >= 0;--i) {
     if(feedbackReloaded.highlighted[i].active == 1) {
-	  context.clearRect(feedbackReloaded.highlighted[i].left, feedbackReloaded.highlighted[i].top, feedbackReloaded.highlighted[i].width, feedbackReloaded.highlighted[i].height);
-	}
+	  context.clearRect(feedbackReloaded.highlighted[i].left, feedbackReloaded.highlighted[i].top, feedbackReloaded.highlighted[i].width, feedbackReloaded.highlighted[i].height)
+    }
   }
   context.clearRect(x, y, width, height);
 };
@@ -299,8 +347,8 @@ feedbackReloaded.reRender = function() {
   context = feedbackCanvas.getContext('2d');
   context.globalAlpha = 0.3;
   context.fillStyle = 'black';
-  context.clearRect(0,0,1366,667);
-  context.fillRect(0,0,1366,667);
+  context.clearRect(0,0,1366,677);
+  context.fillRect(0,0,1366,677);
   context.globalAlpha = 1
   context.strokeStyle = 'black'
   context.lineWidth   = 1;
@@ -338,11 +386,11 @@ feedbackReloaded.startPhaseTwo = function() {
   $('#wizard_content', $('#feedback_form')).html(Drupal.settings.wizardPhaseTwo);
   $("#feedback_form")
     .animate({
-      width: "20%",
-	  height: "33%",
-	},500)
+      width: "30%",
+	  height: "30%",
+	},200)
 	.animate({
-      right: "1%",
+      right: "1%",	  
 	  bottom: "1%",
 	},1000)
 	.draggable();
@@ -352,6 +400,7 @@ feedbackReloaded.startPhaseTwo = function() {
         feedbackReloaded.currentAction = "highlight";
         $(this).attr('disabled','disabled');
         $('#button_blackout').removeAttr("disabled");
+        $('#button_addnote').removeAttr("disabled");
 	  }
     });
   $('#button_blackout', $('#feedback_form'))
@@ -360,21 +409,31 @@ feedbackReloaded.startPhaseTwo = function() {
         feedbackReloaded.currentAction = "blackout";
         $(this).attr('disabled','disabled');
         $('#button_highlight').removeAttr("disabled");
+        $('#button_addnote').removeAttr("disabled");
+	  }
+    });
+  $('#button_addnote', $('#feedback_form'))
+    .bind('click', function() {
+      if( feedbackReloaded.currentAction !== "addnote") {
+        feedbackReloaded.currentAction = "addnote";
+        $(this).attr('disabled','disabled');
+        $('#button_blackout').removeAttr("disabled");
+        $('#button_highlight').removeAttr("disabled");
 	  }
     });
   feedbackReloaded.startFeedback();
 };
 
 feedbackReloaded.startFeedback = function() {
-  $('body').bind('onselectstart', function(){return false;});
+  $('body').bind('onselectstart', function() {return false;} );
   $('#glass').remove();
-  $('<canvas id="feedback_canvas" width=1366 height=667 class="feedback_canvas" onMouseUp="feedbackReloaded.getMouse(this,event);" onMouseDown="feedbackReloaded.getMouse(this,event);" onMouseMove="feedbackReloaded.getMouse(this,event);" ondblclick="return false;" > Your browser does not support canvas element</canvas>')
+  $('<canvas id="feedback_canvas" width=1366 height=677 class="feedback_canvas" onMouseUp="feedbackReloaded.getMouse(this,event);" onMouseDown="feedbackReloaded.getMouse(this,event);" onMouseMove="feedbackReloaded.getMouse(this,event);" ondblclick="return false;" > Your browser does not support canvas element</canvas>')
     .prependTo($('body')); 
   var feedbackCanvas =  document.getElementById("feedback_canvas"),
   context = feedbackCanvas.getContext('2d');
   context.globalAlpha = 0.3;
   context.fillStyle = 'black';
-  context.fillRect(0,0,1366,667);
+  context.fillRect(0,0,1366,677);
 };
 
 feedbackReloaded.stopFeedback = function() {

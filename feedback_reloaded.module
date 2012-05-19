@@ -32,18 +32,17 @@ function feedback_reloaded_init() {
 	drupal_add_library('system', 'ui.draggable');
     $wizardPhaseOne = <<<EOT
 	  <div id="feedback_form" class="feedback_form" onMouseMove="feedbackReloaded.getMouse(this,event);" onMouseUp="feedbackReloaded.getMouse(this,event);">
-      <div style="border-bottom: solid 1px #ccc; float: left; width: 100%; padding-bottom: 10px;">
+      <div style="border-bottom: solid 0px #ccc; float: left; width: 100%; padding-bottom: 0px;">
         <span><img src="$path/image/close.png" style="cursor: pointer; border: solid 0px #ccc; float:right;" onClick="feedbackReloaded.stopFeedback();"></span>
 	    <img src="$path/image/feedback.png" width="" height="17"  \>&nbsp;&nbsp;<span style="font-size: 17px;">Feedback Wizard</span>
 	  </div>
 	  <br style="clear: both;">
       <div id="wizard_content">
       <p>Welcome to the Feedback Wizard. Please start with a short description of your problem.</p>
-      <textarea style="min-height: 100px; min-width:75%; resize: none; border: solid 1px #ccc;"></textarea>
-      <p>Click Next to highlight the problem area.</p>
-      <p>You can cancel the feedback Wizard any time you want by clicking Cancel button.</p>
-      <div style="float:right; border-top: solid 1px #ccc; width: 100%;">
-        <br>
+      <textarea style="height: 100px; width:100%; resize: none; border: solid 1px #ccc;"></textarea>
+      <p>Click Next, then you will be able to annotate this webpage.</p>
+      <div style="float:right; border-top: solid 1px #ccc; width: 100%; padding-top:9px;">
+        
         <button id="button_cancel" style="float:right; height: 30px;" value="Cancel" onClick="feedbackReloaded.stopFeedback();">Cancel</button>
         <span style="float:right;">&nbsp;&nbsp;&nbsp;</span>
         <button id="button_next" style="float:right; height: 30px;" value="Next">Next</button>
@@ -52,14 +51,17 @@ function feedback_reloaded_init() {
 	  </div>  
 EOT;
     $wizardPhaseTwo = <<<EOT
-	  <p>Click to highlight problem area<br \>
+	  <p>
 	  <button id="button_highlight" style="height: 30px; " disabled>Highlight</button>
+	  Click and drag to highlight problem area.
 	  </p>
-      <p>Click to hide personal information<br \>
-      <button id="button_blackout" style="height: 30px;">Blackout</button>
+      <p><button id="button_blackout" style="height: 30px;">Blackout</button>
+	  Click and drag to hide personal information.     
 	  </p>
-	  <div style="float:right; border-top: solid 1px #ccc; width: 100%;">
-        <br>
+      <p><button id="button_addnote" style="height: 30px;">Add Note</button>
+      Click anywhere in page to add a note there.     
+      </p>
+	  <div style="float:right; border-top: solid 1px #ccc; width: 100%; padding-top:9px;">
         <button id="button_cancel" style="float:right; height: 30px;" value="Cancel" onClick="feedbackReloaded.stopFeedback();">Cancel</button>
         <span style="float:right;">&nbsp;&nbsp;&nbsp;</span>
         <button id="button_preview" style="float:right; height: 30px;" value="Next">Preview</button>
