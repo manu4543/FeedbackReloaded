@@ -27,9 +27,13 @@ function feedback_reloaded_permission() {
 function feedback_reloaded_init() {
   if (user_access('access feedback form')) {
     $path = drupal_get_path('module', 'feedback_reloaded');
-    drupal_add_css($path . '/feedback_reloaded.css');
-    drupal_add_js($path . '/feedback_reloaded.js');
-	drupal_add_library('system', 'ui.draggable');
+    drupal_add_css($path . '/feedback_reloaded.css'); // @manu add extra options such as "GROUP" and "EVERY_PAGE"
+    drupal_add_js($path . '/feedback_reloaded.js'); // @manu add extra options such as "GROUP" and "EVERY_PAGE"
+    drupal_add_library('system', 'ui.draggable');
+
+    // @manu this should be a form callback
+    // define the form and do a drupal_retrieve_form() or drupal_get_form() and
+    // add the contents to variable instead of having the entire form inline
     $wizardPhaseOne = <<<EOT
 	  <div id="feedback_form" class="feedback_form" onMouseMove="feedbackReloaded.getMouse(this,event);" onMouseUp="feedbackReloaded.getMouse(this,event);">
       <div style="border-bottom: solid 0px #ccc; float: left; width: 100%; padding-bottom: 0px;">
@@ -42,31 +46,33 @@ function feedback_reloaded_init() {
       <textarea style="height: 100px; width:100%; resize: none; border: solid 1px #ccc;"></textarea>
       <p>Click Next, then you will be able to annotate this webpage.</p>
       <div style="float:right; border-top: solid 1px #ccc; width: 100%; padding-top:9px;">
-        
+
         <button id="button_cancel" style="float:right; height: 30px;" value="Cancel" onClick="feedbackReloaded.stopFeedback();">Cancel</button>
         <span style="float:right;">&nbsp;&nbsp;&nbsp;</span>
         <button id="button_next" style="float:right; height: 30px;" value="Next">Next</button>
       </div>
 	  </div>
-	  </div>  
+	  </div>
 EOT;
+
+    // @manu see above.  this should be a theme function!!
     $wizardPhaseTwo = <<<EOT
 	  <p>
 	  <button id="button_highlight" style="height: 30px; " disabled>Highlight</button>
 	  Click and drag to highlight problem area.
 	  </p>
       <p><button id="button_blackout" style="height: 30px;">Blackout</button>
-	  Click and drag to hide personal information.     
+	  Click and drag to hide personal information.
 	  </p>
       <p><button id="button_addnote" style="height: 30px;">Add Note</button>
-      Click anywhere in page to add a note there.     
+      Click anywhere in page to add a note there.
       </p>
 	  <div style="float:right; border-top: solid 1px #ccc; width: 100%; padding-top:9px;">
         <button id="button_cancel" style="float:right; height: 30px;" value="Cancel" onClick="feedbackReloaded.stopFeedback();">Cancel</button>
         <span style="float:right;">&nbsp;&nbsp;&nbsp;</span>
         <button id="button_preview" style="float:right; height: 30px;" value="Next">Preview</button>
       </div>
-	  
+
 EOT;
 
   drupal_add_js(array('wizardPhaseOne' => $wizardPhaseOne), 'setting');
@@ -76,6 +82,10 @@ EOT;
 
 /**
  * Implements hook_page_build().
+ *
+ * @manu I still think that this should be dynamically generated via javascript
+ *        and appended to the page body instead of adding the markup to the
+ *        page_bottom region (which doesn't necessary always exist)
  */
 function feedback_reloaded_page_build(&$page) {
   if (user_access('access feedback form')) {
