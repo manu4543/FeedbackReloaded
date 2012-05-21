@@ -316,7 +316,9 @@ var feedbackReloaded = {};
     //Drawing a dimmer on whole page
     context.globalAlpha = 0.3;
     context.fillStyle   = 'black';
+    // @manu use page width and height stored in feedbackReloaded object (see above comments)
     context.clearRect(0,0,1366,677);
+    // @manu use page width and height stored in feedbackReloaded object (see above comments)
     context.fillRect(0,0,1366,677);
     context.globalAlpha = 1;
     context.strokeStyle = 'black';
@@ -353,7 +355,9 @@ var feedbackReloaded = {};
     context = feedbackCanvas.getContext('2d');
     context.globalAlpha = 0.3;
     context.fillStyle = 'black';
+    // @manu use page width and height stored in feedbackReloaded object (see above comments)
     context.clearRect(0,0,1366,677);
+    // @manu use page width and height stored in feedbackReloaded object (see above comments)
     context.fillRect(0,0,1366,677);
     context.globalAlpha = 1
     context.strokeStyle = 'black'
@@ -435,12 +439,17 @@ var feedbackReloaded = {};
       return false;
     } );
     $('#glass').remove();
+    // @manu calculate page width and specify value below so that it's "100%"
+    // the page width should be stored in the feedbackReloaded object so
+    // we can use it in other placed.
+    // you should do the same with height
     $('<canvas id="feedback_canvas" width=1366 height=677 class="feedback_canvas" onMouseUp="feedbackReloaded.getMouse(this,event);" onMouseDown="feedbackReloaded.getMouse(this,event);" onMouseMove="feedbackReloaded.getMouse(this,event);" ondblclick="return false;" > Your browser does not support canvas element</canvas>')
     .prependTo($('body'));
     var feedbackCanvas =  document.getElementById("feedback_canvas"),
     context = feedbackCanvas.getContext('2d');
     context.globalAlpha = 0.3;
     context.fillStyle = 'black';
+    // @manu use page width and height stored in feedbackReloaded object (see above comments)
     context.fillRect(0,0,1366,677);
   };
 
