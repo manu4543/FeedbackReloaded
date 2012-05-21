@@ -443,8 +443,11 @@ feedbackReloaded.stopFeedback = function() {
   $('#feedback_form').remove();
   $('body').unbind('onselectstart');
   $('#feedback_canvas').remove();
+  $('div[id*="note_"]').remove();
   $('div[id*="blackout"]').remove();
   $('div[id*="highlight_"]').remove();
   $('div[id*="cross_"]').remove();
+  feedbackReloaded.notes =  feedbackReloaded.blackedout = 0;
+  feedbackReloaded.highlighted = [];
 };
 }(jQuery));
