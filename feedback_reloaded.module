@@ -20,7 +20,6 @@ function feedback_reloaded_permission() {
   );
 }
 
-
 /**
  * Implements hook_init().
  */
@@ -38,13 +37,10 @@ function feedback_reloaded_init() {
 	  </div>
 	  <br style="clear: both;">
       <div id="wizard_content">
-      <p>Welcome to the Feedback Wizard. Please start with a short description of your problem.</p>
-      <textarea style="height: 100px; width:100%; resize: none; border: solid 1px #ccc;"></textarea>
-      <p>Click Next, then you will be able to annotate this webpage.</p>
+      <p>Welcome to the Feedback Wizard. This Wizard lets you send us your problem, feature ideas and general suggestions or comments.</p>
+      <p>Click Next, then you will be able to highilight,blackout and even add short notes in the webpage.</p>
+      <p>This Module will use Java applet to take screenshot of your webpage therefore you are required to allow us if your browser ask for permission.</p>
       <div style="float:right; border-top: solid 1px #ccc; width: 100%; padding-top:9px;">
-        
-        <button id="button_cancel" style="float:right; height: 30px;" value="Cancel" onClick="feedbackReloaded.stopFeedback();">Cancel</button>
-        <span style="float:right;">&nbsp;&nbsp;&nbsp;</span>
         <button id="button_next" style="float:right; height: 30px;" value="Next">Next</button>
       </div>
 	  </div>
@@ -64,19 +60,25 @@ EOT;
 	  <div style="float:right; border-top: solid 1px #ccc; width: 100%; padding-top:9px;">
         <button id="button_cancel" style="float:right; height: 30px;" value="Cancel" onClick="feedbackReloaded.stopFeedback();">Cancel</button>
         <span style="float:right;">&nbsp;&nbsp;&nbsp;</span>
-        <button id="button_preview" style="float:right; height: 30px;" value="Next">Preview</button>
+        <button id="button_preview" style="float:right; height: 30px;" value="Next" onClick="feedbackReloaded.takeScreenshot();">Preview</button>
       </div>
 	  
 EOT;
 
+$wizardPhaseThird = drupal_render(drupal_get_form('feedback_form'));
+$wizardPhaseThird = <<<EOT
+		<img id="preview" style="width:500px; height:300px;"\>
+EOT;
   drupal_add_js(array('wizardPhaseOne' => $wizardPhaseOne), 'setting');
   drupal_add_js(array('wizardPhaseTwo' => $wizardPhaseTwo), 'setting');
+  drupal_add_js(array('wizardPhaseThird' => $wizardPhaseThird), 'setting');
+  drupal_add_js(array('moduleBasePath' => $path), 'setting');
   }
 }
 
 /**
  * Implements hook_page_build().
- */
+ 
 function feedback_reloaded_page_build(&$page) {
   if (user_access('access feedback form')) {
     $page['page_bottom']['feedback'] = array(
@@ -84,4 +86,29 @@ function feedback_reloaded_page_build(&$page) {
       '#markup' => t('<div id="feedback_button" class="feedback_button">Feedback</div>'),
     );
   }
+}
+*/
+/**
+ * Form constructor for the feedback form.
+ *
+ * @see feedback_form_submit()
+ * @ingroup forms
+ */
+function feedback_form($form, &$form_state) {  
+  $form['message'] = array(
+    '#type' => 'textarea',
+    '#attributes' => array('class' => array('feedback-message')),
+    '#cols' => 20,
+    '#title' => t('Message'),
+    '#required' => TRUE,
+    '#wysiwyg' => FALSE,
+  );
+
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Send feedback'),
+    '#id' => 'feedback-submit',
+  );
+
+  return $form;
 }

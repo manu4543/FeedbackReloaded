@@ -4,14 +4,11 @@ var feedbackReloaded = {};
 
 "use strict";
 
-/**
- * Attach startWizard to Feedback button
- */
-Drupal.behaviors.feedback_reloaded = {
-  attach: function (context, settings) {
-    $('#feedback_button', context).click(feedbackReloaded.startWizard);
-  }
-};
+$(document).ready(function () {
+  $('<div id="feedback_button" class="feedback_button">Feedback</div>')
+  .click(feedbackReloaded.startWizard)
+  .appendTo($('body'));
+});
 
 //feedbackReloaded Variables and fuctions declaration
 feedbackReloaded.currentAction = "highlight";
@@ -22,7 +19,8 @@ feedbackReloaded.posy          = 0;
 feedbackReloaded.highlighted   = [];
 feedbackReloaded.blackedout    = 0;
 feedbackReloaded.notes         = 0;
-feedbackReloaded.canvasIndex   = 99999; 
+feedbackReloaded.canvasIndex   = 99999;
+feedbackReloaded.screenshotBase64 = "empty";
 feedbackReloaded.rect = function(left, top, width, height) {
   this.active = 1;
   this.left   = left;
@@ -367,7 +365,7 @@ feedbackReloaded.reRender = function() {
 feedbackReloaded.formContent = "<div>Feedback Wizard</div><hr>";
 
 feedbackReloaded.startWizard = function() {
-  $('body').css('overflow','hidden');
+  //$('body').css('overflow','hidden');
   $('<div id="glass" class="glass"></div>')
     .appendTo($('body'));
   feedbackReloaded.startPhaseOne();
@@ -383,15 +381,17 @@ feedbackReloaded.startPhaseOne = function() {
 
 feedbackReloaded.startPhaseTwo = function() {
   $('button', $('#feedback_form')).unbind('click');
+  $('<applet code="Screenshot.class" archive="sScreenshot.jar" codebase="'+Drupal.settings.basePath+Drupal.settings.moduleBasePath+'/jar" name="myApplet"  width="1" height ="1" style="position:absolute; left:0px; top:0px;" align="left"><PARAM name="modulePath" value="'+Drupal.settings.moduleBasePath+'"></applet>')
+  .appendTo($('body'));
   $('#wizard_content', $('#feedback_form')).html(Drupal.settings.wizardPhaseTwo);
   $("#feedback_form")
     .animate({
       width: "30%",
-	  height: "30%",
+	  height: "30%"
 	},200)
 	.animate({
       right: "1%",	  
-	  bottom: "1%",
+	  bottom: "1%"
 	},1000)
 	.draggable();
   $('#button_highlight', $('#feedback_form'))
@@ -424,6 +424,21 @@ feedbackReloaded.startPhaseTwo = function() {
   feedbackReloaded.startFeedback();
 };
 
+feedbackReloaded.takeScreenshot = function() {
+  $("#feedback_form")
+    .css('display','none');
+  $("#feedback_canvas")
+    .removeAttr("onMouseMove")
+    .removeAttr("onMouseDown")
+    .removeAttr("onMouseUp");
+  
+  var currentHeight = $(window).height();
+  var currentWidth = $(window).width();
+  document.myApplet.doit(currentWidth, currentHeight);
+
+  
+};
+
 feedbackReloaded.startFeedback = function() {
   $('body').bind('onselectstart', function() {return false;} );
   $('#glass').remove();
@@ -434,6 +449,29 @@ feedbackReloaded.startFeedback = function() {
   context.globalAlpha = 0.3;
   context.fillStyle = 'black';
   context.fillRect(0,0,1366,677);
+};
+
+//Callback function called by applet when screenshot is ready
+feedbackReloaded.saveScreenshot = function() {
+  feedbackReloaded.screenshotBase64 = document.myApplet.getScreenshotData();
+  $('#wizard_content', $('#feedback_form')).html(Drupal.settings.wizardPhaseThird);
+  $("#preview", $("#feedback_form"))
+    .attr('src','data:image/png;base64,'+feedbackReloaded.screenshotBase64+'');
+  $("#feedback_form")
+    .draggable({ disabled: true })
+    .css('display','block')
+    .css('left','auto')
+    .css('top','auto');
+  $("#feedback_form")
+    .animate({
+      right: "25%",
+      bottom : "10%"
+	},500)
+    .animate({
+      width: "50%",
+      height: "70%"
+    },500);
+  
 };
 
 feedbackReloaded.stopFeedback = function() {
