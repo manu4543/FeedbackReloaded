@@ -66,7 +66,7 @@ EOT;
 EOT;
 
 $wizardPhaseThird = drupal_render(drupal_get_form('feedback_form'));
-$wizardPhaseThird = <<<EOT
+$wizardPhaseThird .= <<<EOT
 		<img id="preview" style="width:500px; height:300px;"\>
 EOT;
   drupal_add_js(array('wizardPhaseOne' => $wizardPhaseOne), 'setting');
