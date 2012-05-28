@@ -21,6 +21,111 @@ function feedback_reloaded_permission() {
 }
 
 /**
+ * Implements hook_entity_info().
+ */
+function feedback_reloaded_entity_info() {
+  $return = array();
+
+  // Feedback Type entity.
+  $return['feedback_reloaded_type'] = array(
+    'label' => t('Feedback Type'),
+    'plural label' => t('Feedback Types'),
+    'entity class' => 'FeedbackRType',
+    'controller class' => 'FeedbackRTypeController',
+    'base table' => 'feedback_reloaded_type',
+    'fieldable' => FALSE,
+    'exportable' => TRUE,
+    'entity keys' => array(
+      'id' => 'id',
+    ),
+    'bundles' => array(),
+    'bundle of' => 'feedback_reloaded',
+    'access callback' => 'feedbackR_access',
+    'module' => 'feedback_reloaded',
+    // Enable the Entity API's admin UI.
+    'admin ui' => array(
+      'path' => 'admin/structure/feedback-types',
+      'file' => 'feedback_reloaded.admin.inc',
+      'controller class' => 'feedbackRTypeUIController',
+    ),
+  );
+
+  // Feedback entity.
+  $return['feedback_reloaded'] = array(
+    'label' => t('Feedback'),
+    'plural label' => t('Feedbacks'),
+    'entity class' => 'feedbackR',
+    'controller class' => 'feedbackRController',
+    'base table' => 'feedback_reloaded',
+    'fieldable' => TRUE,
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Full'),
+        'custom settings' => FALSE,
+      ),
+    ),
+    'entity keys' => array(
+      'id' => 'fid',
+      'bundle' => 'type',
+    ),
+    'bundles' => array(),
+    'bundle keys' => array(
+      'bundle' => 'name',
+    ),
+    'uri callback' => 'entity_class_uri',
+    'label callback' => 'entity_class_label',
+    'access callback' => 'feedbackR_access',
+    'module' => 'feedback_reloaded',
+    'metadata controller class' => 'feedbackRMetadataController',
+  );
+
+  
+
+  return $return;
+}
+
+/**
+* Implements hook_entity_info_alter().
+*/
+function feedback_reloaded_entity_info_alter(&$entity_info) {
+  foreach (feedback_reloaded_types() as $type => $info) {
+    $entity_info['feedback_reloaded']['bundles'][$type] = array(
+      'label' => $info->label,
+      'admin' => array(
+        'path' => 'admin/structure/feedbacks/manage/%feedback_reloaded_type',
+        'real path' => 'admin/structure/feedbacks/manage/' . $type,
+        'bundle argument' => 4,
+      ),
+    );
+  }
+}
+
+function feedback_reloaded_types($type_name = NULL) {
+  $types = entity_load_multiple_by_name('feedback_reloaded_type', isset($type_name) ? array($type_name) : FALSE);
+  return isset($type_name) ? reset($types) : $types;
+}
+
+/**
+ * Determines whether the given user has access to a feedback or feedback type
+ * operation.
+ *
+ * @param $op
+ *   The operation being performed. One of 'view', 'update', 'create', 'delete'
+ *   or just 'edit' (being the same as 'create' or 'update'). This isn't
+ *   actually used as there is one global administer subs types permission.
+ * @param $type
+ *   The subscription type we want to check access for. This isn't
+ *   actually used as there is one global administer subs types permission.
+ * @param $account
+ *   The user to check for. Leave it NULL to check for the current user.
+ * @return bool
+ *   Whether the user has access.
+ */
+function feedbackR_access($op, $type = NULL, $account = NULL) {
+  return user_access('administer feedback', $account);
+}
+ 
+/**
  * Implements hook_init().
  */
 function feedback_reloaded_init() {
@@ -65,10 +170,12 @@ EOT;
 	  
 EOT;
 
-$wizardPhaseThird = drupal_render(drupal_get_form('feedback_form'));
-$wizardPhaseThird .= <<<EOT
-		<img id="preview" style="width:500px; height:300px;"\>
+
+$wizardPhaseThird = <<<EOT
+		<img id="preview" class="preview_screenshot"\><br>
 EOT;
+
+$wizardPhaseThird .= drupal_render(drupal_get_form('feedback_form'));
   drupal_add_js(array('wizardPhaseOne' => $wizardPhaseOne), 'setting');
   drupal_add_js(array('wizardPhaseTwo' => $wizardPhaseTwo), 'setting');
   drupal_add_js(array('wizardPhaseThird' => $wizardPhaseThird), 'setting');
@@ -111,4 +218,30 @@ function feedback_form($form, &$form_state) {
   );
 
   return $form;
+}
+
+
+############################
+### API Functions - CRUD ###
+############################
+
+
+/**
+ * Returns an array of all subscription types, keyed by the type name.
+ *
+ * @param $type_name
+ *   If set, the type with the given name is returned.
+ * @return SubsType[]
+ *   Depending whether $type isset, an array of subscription types or a
+ *   single one.
+ */
+function feedback_reloaded_get_types($type_name = NULL) {
+  $feedback_reloaded_types = &drupal_static(__FUNCTION__);
+
+  if (empty($feedback_reloaded_types)) {
+    $feedback_reloaded_types = entity_load_multiple_by_name('feedback_reloaded_type', isset($type_name) ? array($type_name)
+          : FALSE);
+  }
+
+  return isset($type_name) ? reset($feedback_reloaded_types) : $feedback_reloaded_types;
 }

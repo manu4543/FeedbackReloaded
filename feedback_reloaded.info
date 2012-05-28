@@ -1,4 +1,10 @@
 name = Feedback Reloaded
 description = A Complete Feedback solution for web-developer.
 package = Development
+dependencies[] = entity
 core = 7.x
+
+; Entity API includes
+files[] = feedback_reloaded.admin.inc
+files[] = feedback_reloaded.entity.inc
+files[] = feedback_reloaded.info.inc

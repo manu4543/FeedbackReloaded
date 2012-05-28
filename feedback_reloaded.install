@@ -1,0 +1,142 @@
+<?php
+
+/**
+ * @file
+ * Installation functions for Feedback module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function feedback_reloaded_uninstall() {
+  $result = db_select('variable', 'v')
+    ->fields('v', array('name'))
+    ->condition('name', 'feedback_reloaded%', '=')
+    ->execute();
+
+  foreach ($result as $row) {
+    variable_del($row->name);
+  }
+}
+
+/**
+ * Implements hook_schema().
+ */
+function feedback_reloaded_schema() {
+  $schema = array();
+
+  $schema['feedback_reloaded'] = array(
+    'description' => 'Stores all feedback messages.',
+    'fields' => array(
+      'fid' => array(
+        'description' => 'Feedback message ID.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+	  'type' => array(
+        'description' => 'The {feedback_reloaded_type}.type of this subscription.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'uid' => array(
+        'description' => 'User ID of the feedback message author.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'description' => 'Feedback status (0 = new, 1 = processed).',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'message' => array(
+        'description' => 'The feedback message.',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+      'location' => array(
+        'description' => 'System path of the originating page.',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'location_masked' => array(
+        'description' => 'Untranslated system path of the originating page.',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'url' => array(
+        'description' => 'Absolute URL of the originating page.',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'useragent' => array(
+        'description' => 'User agent of the feedback message author.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'timestamp' => array(
+        'description' => 'UNIX timestamp of the feedback message creation date.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('fid'),
+    'indexes' => array(
+      'location' => array(array('location', 32)),
+      'location_masked' => array(array('location_masked', 32)),
+    ),
+  );
+  
+  $schema['feedback_reloaded_type'] = array(
+    'description' => 'Stores information about defined feedback types.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique feedback type identifier.',
+      ),
+      'type' => array(
+        'description' => 'The machine-readable name of this feedback type.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'label' => array(
+        'description' => 'The human-readable name of this feedback type.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'weight' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => 'The weight of this feedback type in relation to others.',
+      ),
+      'data' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'A serialized array of additional data related to this feedback type.',
+      ),
+    ),
+    'primary key' => array('id'),
+    'unique keys' => array(
+      'type' => array('type'),
+    ),
+  );
+  return $schema;
+}
