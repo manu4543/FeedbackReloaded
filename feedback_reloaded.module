@@ -37,16 +37,18 @@ function feedback_reloaded_entity_info() {
     'exportable' => TRUE,
     'entity keys' => array(
       'id' => 'id',
+      'name' => 'name',
+      'label' => 'label',
     ),
     'bundles' => array(),
     'bundle of' => 'feedback_reloaded',
-    'access callback' => 'feedbackR_access',
+    'access callback' => 'feedback_reloaded_access',
     'module' => 'feedback_reloaded',
     // Enable the Entity API's admin UI.
     'admin ui' => array(
       'path' => 'admin/structure/feedback-types',
       'file' => 'feedback_reloaded.admin.inc',
-      'controller class' => 'feedbackRTypeUIController',
+      'controller class' => 'FeedbackRTypeUIController',
     ),
   );
 
@@ -54,8 +56,8 @@ function feedback_reloaded_entity_info() {
   $return['feedback_reloaded'] = array(
     'label' => t('Feedback'),
     'plural label' => t('Feedbacks'),
-    'entity class' => 'feedbackR',
-    'controller class' => 'feedbackRController',
+    'entity class' => 'FeedbackR',
+    'controller class' => 'FeedbackRController',
     'base table' => 'feedback_reloaded',
     'fieldable' => TRUE,
     'view modes' => array(
@@ -74,12 +76,12 @@ function feedback_reloaded_entity_info() {
     ),
     'uri callback' => 'entity_class_uri',
     'label callback' => 'entity_class_label',
-    'access callback' => 'feedbackR_access',
+    'access callback' => 'feedback_reloaded_access',
     'module' => 'feedback_reloaded',
-    'metadata controller class' => 'feedbackRMetadataController',
+    'metadata controller class' => 'FeedbackRMetadataController',
   );
 
-  
+
 
   return $return;
 }
@@ -121,10 +123,10 @@ function feedback_reloaded_types($type_name = NULL) {
  * @return bool
  *   Whether the user has access.
  */
-function feedbackR_access($op, $type = NULL, $account = NULL) {
+function feedback_reloaded_access($op, $type = NULL, $account = NULL) {
   return user_access('administer feedback', $account);
 }
- 
+
 /**
  * Implements hook_init().
  */
@@ -149,7 +151,7 @@ function feedback_reloaded_init() {
         <button id="button_next" style="float:right; height: 30px;" value="Next">Next</button>
       </div>
 	  </div>
-	  </div>  
+	  </div>
 EOT;
     $wizardPhaseTwo = <<<EOT
 	  <p>
@@ -157,17 +159,17 @@ EOT;
 	  Click and drag to highlight problem area.
 	  </p>
       <p><button id="button_blackout" style="height: 30px;">Blackout</button>
-	  Click and drag to hide personal information.     
+	  Click and drag to hide personal information.
 	  </p>
       <p><button id="button_addnote" style="height: 30px;">Add Note</button>
-      Click anywhere in page to add a note there.     
+      Click anywhere in page to add a note there.
       </p>
 	  <div style="float:right; border-top: solid 1px #ccc; width: 100%; padding-top:9px;">
         <button id="button_cancel" style="float:right; height: 30px;" value="Cancel" onClick="feedbackReloaded.stopFeedback();">Cancel</button>
         <span style="float:right;">&nbsp;&nbsp;&nbsp;</span>
         <button id="button_preview" style="float:right; height: 30px;" value="Next" onClick="feedbackReloaded.takeScreenshot();">Preview</button>
       </div>
-	  
+
 EOT;
 
 
@@ -185,7 +187,7 @@ $wizardPhaseThird .= drupal_render(drupal_get_form('feedback_form'));
 
 /**
  * Implements hook_page_build().
- 
+
 function feedback_reloaded_page_build(&$page) {
   if (user_access('access feedback form')) {
     $page['page_bottom']['feedback'] = array(
@@ -201,7 +203,7 @@ function feedback_reloaded_page_build(&$page) {
  * @see feedback_form_submit()
  * @ingroup forms
  */
-function feedback_form($form, &$form_state) {  
+function feedback_form($form, &$form_state) {
   $form['message'] = array(
     '#type' => 'textarea',
     '#attributes' => array('class' => array('feedback-message')),

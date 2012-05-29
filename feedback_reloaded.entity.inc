@@ -5,7 +5,7 @@
  * Feedback entity and controller classes.
  */
 
-class feedbackRController extends EntityAPIController {
+class FeedbackRController extends EntityAPIController {
 }
 
 class FeedbackRTypeController extends EntityAPIControllerExportable {
@@ -16,7 +16,7 @@ class FeedbackRTypeController extends EntityAPIControllerExportable {
 /**
  * FeedbackR class.
  */
-class feedbackR extends Entity {
+class FeedbackR extends Entity {
   protected function defaultLabel() {
     return $this->title;
   }

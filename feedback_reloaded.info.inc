@@ -7,6 +7,6 @@
 /**
  * Extend the defaults.
  */
-class feedbackRMetadataController extends EntityDefaultMetadataController {
+class FeedbackRMetadataController extends EntityDefaultMetadataController {
 
 }

@@ -3,7 +3,7 @@
 /**
  * Feedback Type UI Controller.
  */
-class feedbackRTypeUIController extends EntityDefaultUIController {
+class FeedbackRTypeUIController extends EntityDefaultUIController {
 
   /**
    * Overrides hook_menu() defaults.
