@@ -35,7 +35,7 @@ function feedback_reloaded_type_form($form, &$form_state, $feedback_reloaded_typ
   );
   
   // Machine-readable type name.
-  $form['type'] = array(
+  $form['name'] = array(
     '#type' => 'machine_name',
     '#default_value' => isset($feedback_reloaded_type->type) ? $feedback_reloaded_type->type : '',
     '#machine_name' => array(
@@ -67,6 +67,5 @@ function feedback_reloaded_type_form_submit(&$form, &$form_state) {
   $feedback_reloaded_type = entity_ui_form_submit_build_entity($form, $form_state);
   // Save and go back.
   $feedback_reloaded_type->save();
-    drupal_set_message(t('Error saving Subscription type %label.', array('%label' => $feedback_reloaded_type->getTranslation('label'))), 'error');
   $form_state['redirect'] = 'admin/structure/feedbacks';
 }
