@@ -46,6 +46,7 @@ function feedback_reloaded_type_form($form, &$form_state, $feedback_reloaded_typ
   );
   
   $form['description'] = array(
+    '#title' => t('Description'),
     '#type' => 'textarea',
     '#default_value' => isset($feedback_reloaded_type->description) ? $feedback_reloaded_type->description : '',
     '#description' => t('Description about the feedback type.'),
