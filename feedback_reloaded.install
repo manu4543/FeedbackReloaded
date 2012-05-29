@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Installation functions for Feedback module.
@@ -34,7 +33,7 @@ function feedback_reloaded_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-	  'type' => array(
+      'type' => array(
         'description' => 'The {feedback_reloaded_type}.type of this subscription.',
         'type' => 'varchar',
         'length' => 32,
@@ -96,7 +95,7 @@ function feedback_reloaded_schema() {
       'location_masked' => array(array('location_masked', 32)),
     ),
   );
-  
+
   $schema['feedback_reloaded_type'] = array(
     'description' => 'Stores information about defined feedback types.',
     'fields' => array(
