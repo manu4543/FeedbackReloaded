@@ -40,7 +40,6 @@ function feedback_reloaded_entity_info() {
       'name' => 'name',
       'label' => 'label',
     ),
-    'bundles' => array(),
     'bundle of' => 'feedback_reloaded',
     'access callback' => 'feedback_reloaded_access',
     'module' => 'feedback_reloaded',
@@ -70,10 +69,10 @@ function feedback_reloaded_entity_info() {
       'id' => 'fid',
       'bundle' => 'type',
     ),
-    'bundles' => array(),
     'bundle keys' => array(
       'bundle' => 'name',
     ),
+				'bundles' => array(),
     'uri callback' => 'entity_class_uri',
     'label callback' => 'entity_class_label',
     'access callback' => 'feedback_reloaded_access',
@@ -227,6 +226,187 @@ function feedback_form($form, &$form_state) {
 ### API Functions - CRUD ###
 ############################
 
+/**
+ * Fetch a subscription object.
+ *
+ * @param $fid
+ *   Integer specifying the subscription id.
+ * @param $reset
+ *   A boolean indicating that the internal cache should be reset.
+ * @return
+ *   A fully-loaded $feedback_reloaded object or FALSE if it cannot be loaded.
+ *
+ * @see feedback_reloaded_load_multiple()
+ */
+function feedback_reloaded_load($fid, $reset = FALSE) {
+  $feedback_reloadeds = feedback_reloaded_load_multiple(array($fid), array(), $reset);
+  return reset($feedback_reloadeds);
+}
+
+/**
+ * Load multiple subscriptions based on certain conditions.
+ *
+ * @param $sids
+ *   An array of subscription IDs.
+ * @param $conditions
+ *   An array of conditions to match against the {subs} table.
+ * @param $reset
+ *   A boolean indicating that the internal cache should be reset.
+ * @return array|FALSE
+ *   An array of subscription objects, indexed by ID or FALSE of none were found.
+ *
+ * @see entity_load()
+ * @see feedback_reloaded_load()
+ * @see feedback_reloaded_load_by_user()
+ */
+function feedback_reloaded_load_multiple($fids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('feedback_reloaded', $fids, $conditions, $reset);
+}
+
+/**
+ * Fetch subscriptions by account.
+ *
+ * @param $account
+ *   The user account to load subscriptions for, or its uid.
+ * @param $type_name
+ *   To load subscriptions of a single type, specify it.
+ * @param $reset
+ *   To bypass the static cache set this to true.
+ * @return Subs|array|FALSE
+ *   Either a single subscription or an array of subscriptions keyed by
+ *   subscription type or FALSE of no subscriptions found.
+ *
+ * @see feedback_reloaded_load_multiple()
+ */
+function feedback_reloaded_load_by_user($account, $type_name = NULL, $reset = FALSE) {
+  // Use a separate query to determine all subscription ids per user and cache them.
+  // That way we can look up subscriptions by id and benefit from the static cache
+  // of the entity loader.
+  $cache = &drupal_static(__FUNCTION__, array());
+  $uid = is_object($account) ? $account->uid : $account;
+
+  if (!isset($cache[$uid]) || $reset) {
+    if (empty($type_name)) {
+      $feedback_reloadeds = feedback_reloaded_load_multiple(FALSE, array('uid' => $uid));
+      // Cache ids for further lookups.
+      $cache[$uid] = array();
+      foreach ($feedback_reloadeds as $fid => $feedback_reloaded) {
+        $cache[$uid][] = $sid;
+      }
+      return $feedback_reloadeds;
+    }
+    $cache[$uid] = db_select('feedback_reloaded', 'fr')
+      ->fields('fr', array('fid'))
+      ->condition('uid', $uid)
+      ->execute()
+      ->fetchCol();
+  }
+
+  if (!empty($type_name)) {
+    // Manually filter, as array_filter() can't take additional parameters.
+    $feedback_reloaded_filtered = array();
+
+    foreach ($cache[$uid] as $sid) {
+      if ($feedback_reloaded = feedback_reloaded_load($fid)) {
+        if ($feedback_reloaded->type === $type_name) {
+          $feedback_reloaded_filtered[$fid] = $feedback_reloaded;
+        }
+      }
+    }
+
+    return $feedback_reloaded_filtered;
+  }
+
+  // Return an array containing subscriptions keyed by subscription id.
+  return feedback_reloaded_load_multiple($cache[$uid]);
+}
+
+/**
+ * Deletes a subscription.
+ * Set it to cancelled before to trigger any relevant events.
+ *
+ * @param Subs
+ *   The subscription object.
+*/
+function feedback_reloaded_delete(FeedbackR $feedback_reloaded) {
+  //feedback_reloaded_set_cancelled($feedback_reloaded);
+  $feedback_reloaded->delete();
+}
+ 
+/**
+ * Delete multiple subscriptions.
+ *
+ * @param array
+ *   An array of subscription IDs.
+ */
+function feedback_reloaded_delete_multiple(array $fids) {
+  // Bypass the traditional entity_get_controller() approach because we
+  // need to cancel each subscription before its deleted.
+  foreach ($fids as $fid) {
+    if ($feedback_reloaded = feedback_reloaded_load($fid)) {
+      feedback_reloaded_delete($feedback_reloaded);
+    }
+  }
+}
+
+/**
+ * Create a new subscription object.
+ *
+ * @param $values
+ *   An array of values to initialize the subscription with.
+ * @return Subs
+ *   The newly-created subscription object.
+ */
+function feedback_reloaded_create(array $values) {
+  return new FeedbackR($values);
+}
+
+/**
+ * Saves a subscription.
+ *
+ * @param $feedback_reloaded
+ *   The subscription object.
+ * @return boolean
+ *   Whether the subscription was saved successfully.
+ */
+function feedback_reloaded_save(FeedbackR $feedback_reloaded) {
+  return $feedback_reloaded->save();
+}
+
+/**
+* Load task Type.
+*/
+function feedback_reloaded_type_load($type) {
+  return feedback_reloaded_types($type);
+}
+/**
+* List of task Types.
+*/
+function feedback_reloaded_type_types($type = NULL) {
+  $types = entity_load_multiple_by_name('feedback_reloaded_type', isset($type) ? array($type) : FALSE);
+  return isset($type) ? reset($types) : $types;
+}
+
+/**
+* Save task type entity.
+*/
+function feedback_reloaded_type_save($type) {
+  entity_save('feedback_reloaded_type', $type);
+}
+
+/**
+* Delete single case type.
+*/
+function feedback_reloaded_type_delete($type) {
+  entity_delete('feedback_reloaded_type', entity_id('feedback_reloaded_type' ,$type));
+}
+
+/**
+* Delete multiple case types.
+*/
+function feedback_reloaded_type_delete_multiple($type_ids) {
+  entity_delete_multiple('feedback_reloaded_type', $type_ids);
+}
 
 /**
  * Returns an array of all subscription types, keyed by the type name.
