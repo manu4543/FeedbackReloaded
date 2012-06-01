@@ -45,7 +45,7 @@ function feedback_reloaded_entity_info() {
     'module' => 'feedback_reloaded',
     // Enable the Entity API's admin UI.
     'admin ui' => array(
-      'path' => 'admin/structure/feedback-types',
+      'path' => 'admin/structure/feedbacks',
       'file' => 'feedback_reloaded.admin.inc',
       'controller class' => 'FeedbackRTypeUIController',
     ),
