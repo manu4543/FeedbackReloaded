@@ -126,6 +126,8 @@ function feedback_reloaded_access($op, $type = NULL, $account = NULL) {
   return user_access('administer feedback', $account);
 }
 
+
+
 /**
  * Implements hook_init().
  */
@@ -134,26 +136,24 @@ function feedback_reloaded_init() {
     $path = drupal_get_path('module', 'feedback_reloaded');
     drupal_add_css($path . '/feedback_reloaded.css');
     drupal_add_js($path . '/feedback_reloaded.js');
-	drupal_add_library('system', 'ui.draggable');
-    $wizardPhaseOne = <<<EOT
-	  <div id="feedback_form" class="feedback_form" onMouseMove="feedbackReloaded.getMouse(this,event);" onMouseUp="feedbackReloaded.getMouse(this,event);">
+   	drupal_add_library('system', 'ui.draggable');
+
+ 
+				$wizardContainer = <<<EOT
+					<div id="feedback_form_container" class="feedback_form" onMouseMove="feedbackReloaded.getMouse(this,event);" onMouseUp="feedbackReloaded.getMouse(this,event);">
       <div style="border-bottom: solid 0px #ccc; float: left; width: 100%; padding-bottom: 0px;">
         <span><img src="$path/image/close.png" style="cursor: pointer; border: solid 0px #ccc; float:right;" onClick="feedbackReloaded.stopFeedback();"></span>
-	    <img src="$path/image/feedback.png" width="" height="17"  \>&nbsp;&nbsp;<span style="font-size: 17px;">Feedback Wizard</span>
-	  </div>
-	  <br style="clear: both;">
-      <div id="wizard_content">
-      <p>Welcome to the Feedback Wizard. This Wizard lets you send us your problem, feature ideas and general suggestions or comments.</p>
-      <p>Click Next, then you will be able to highilight,blackout and even add short notes in the webpage.</p>
-      <p>This Module will use Java applet to take screenshot of your webpage therefore you are required to allow us if your browser ask for permission.</p>
-      <div style="float:right; border-top: solid 1px #ccc; width: 100%; padding-top:9px;">
-        <button id="button_next" style="float:right; height: 30px;" value="Next">Next</button>
-      </div>
-	  </div>
-	  </div>
+	       <img src="$path/image/fb.gif" height="30" \>&nbsp;&nbsp;<span style="font-size: 18px;">Feedback Wizard</span>
+	     </div>
+					<div id="wizard_form_feedbacktype" style="display:none;"></div>
+					<div id="wizard_form_feedback" style="display:none;"></div>
+					<div id="wizard_content"></div>
+					</div>
 EOT;
-    $wizardPhaseTwo = <<<EOT
-	  <p>
+
+    $wizardPhaseOneContent = drupal_render(drupal_get_form('feedback_type_form'));
+	   $wizardPhaseTwoContent = <<<EOT
+	  <p style="margin-top:50px;">
 	  <button id="button_highlight" style="height: 30px; " disabled>Highlight</button>
 	  Click and drag to highlight problem area.
 	  </p>
@@ -167,60 +167,146 @@ EOT;
         <button id="button_cancel" style="float:right; height: 30px;" value="Cancel" onClick="feedbackReloaded.stopFeedback();">Cancel</button>
         <span style="float:right;">&nbsp;&nbsp;&nbsp;</span>
         <button id="button_preview" style="float:right; height: 30px;" value="Next" onClick="feedbackReloaded.takeScreenshot();">Preview</button>
-      </div>
-
+   </div>			
 EOT;
-
-
-$wizardPhaseThird = <<<EOT
-		<img id="preview" class="preview_screenshot"\><br>
-EOT;
-
-$wizardPhaseThird .= drupal_render(drupal_get_form('feedback_form'));
-  drupal_add_js(array('wizardPhaseOne' => $wizardPhaseOne), 'setting');
-  drupal_add_js(array('wizardPhaseTwo' => $wizardPhaseTwo), 'setting');
-  drupal_add_js(array('wizardPhaseThird' => $wizardPhaseThird), 'setting');
-  drupal_add_js(array('moduleBasePath' => $path), 'setting');
+	
+				drupal_add_js(array('wizardContainer' => $wizardContainer), 'setting');
+				drupal_add_js(array('wizardPhaseOneContent' => $wizardPhaseOneContent), 'setting');
+    drupal_add_js(array('wizardPhaseTwoContent' => $wizardPhaseTwoContent), 'setting');
+	   drupal_add_js(array('moduleBasePath' => $path), 'setting');
   }
 }
 
 /**
- * Implements hook_page_build().
-
-function feedback_reloaded_page_build(&$page) {
-  if (user_access('access feedback form')) {
-    $page['page_bottom']['feedback'] = array(
-      '#title' => t('Feedback'),
-      '#markup' => t('<div id="feedback_button" class="feedback_button">Feedback</div>'),
-    );
-  }
-}
-*/
-/**
- * Form constructor for the feedback form.
- *
- * @see feedback_form_submit()
- * @ingroup forms
+ * Simple form whose ajax-enabled 'changethis' member causes a text change
+ * in the description of the 'replace_textfield' member.
+ * See @link http://drupal.org/node/262422 Form API Tutorial @endlink
  */
-function feedback_form($form, &$form_state) {
-  $form['message'] = array(
-    '#type' => 'textarea',
-    '#attributes' => array('class' => array('feedback-message')),
-    '#cols' => 20,
-    '#title' => t('Message'),
-    '#required' => TRUE,
-    '#wysiwyg' => FALSE,
+function feedback_type_form($form, &$form_state) {
+  $form = array();
+		$feedbackTypes = array();
+  
+		foreach (feedback_reloaded_get_types() as $type => $info) {
+		$key = $info->getTranslation('name');
+		$value = $info->getTranslation('label');
+  $feedbackTypes[$key] = $value;
+		}
+		
+		$form['div_tag'] = array(
+    '#markup' => '<p style="margin-bottom:9px; margin-top:50px;">Welcome to Feedback Wizard. This wizard will let you send bug reports, new feature ideas, suggestions and other comments.<br><br>Choose one of the following feedback type.</p>',
   );
+		
+  $form['feedbacktype'] = array(
+    '#type' => 'select',
+    '#options' => $feedbackTypes,
+				'#attributes' => array(
+				  'style' => 'width: 150px; text-align: center;height: 28px !important;',
+				),
+			
+  );
+		
+		$form['div_tag2'] = array(
+    '#markup' => '<p style="margin-bottom:9px;">Click next then you will be able to highlight the problem area.</p>',
+  );
+		
+		$form['button'] = array(
+    '#type' => 'button',
+    '#value' => t('Next'),
+				'#attributes' => array(
+				  'onclick' => 'feedbackReloaded.startPhaseTwo()',
+				),
+				'#ajax' => array(
+      'callback' => 'feedback_type_form_callback',
+						'event' => 'click',
+						// set progress to something else then bar and throbber, although not a standard but removes any progress indicator.
+						'progress' => 'NULL',
+     ),
+  );
+		
+		
+		
+		return $form;
+}
 
+/**
+ * Callback for ajax_example_simplest.
+ *
+ * On an ajax submit, the form builder function is called again, then the $form
+ * and $form_state are passed to this callback function so it can select which
+ * portion of the form to send on to the client.
+ *
+ * @return renderable array (the textfield element)
+ */
+function feedback_type_form_callback($form, $form_state) {		
+  
+		//Create feedback form for selected feedback form type and save in Drupal.settings
+		$feedbackType = feedback_reloaded_get_types($form_state['values']['feedbacktype']);
+		$feedback = entity_create('feedback_reloaded', array('type' => $feedbackType));
+		$feedback_form = drupal_get_form('feedback_reloaded_form', $feedback);
+		drupal_add_js(array('feeedbackForm' => drupal_render($feedback_form)) , 'setting');
+		
+		//Now return the $form as it is.
+  return $form;
+} 
+
+function feedback_reloaded_form($form, &$form_state, $feedback) {
+  $form_state['feedback'] = $feedback;
+  $feedback_type = subs_get_types($feedback->type);
+  $aid = entity_id('feedback_reloaded', $feedback);
+		$administer_feedback_reloaded = user_access('administer feedback');
+		
+		field_attach_form('feedback_reloaded', $feedback, $form, $form_state);  
+
+  $form['div_tag'] = array(
+    '#markup' => '<p style="margin-top:50px; margin-bottom:9px;">Please give us the brief desciption reagarding your feedback.</p>',
+  );
+		
+  $form['message'] = array(
+		  '#type' => 'textarea',
+ 			'#required' => TRUE,
+				'#attributes' => array(
+				  'style' => 'width: 500px;',
+				),
+		);
+  
+		$form['preview'] = array(
+    '#markup' => '<p><strong>Screenshot Preview</strong><br><img id="preview" class="preview_div" src=""></img></p>'
+  );
+		
+  $form['actions'] = array(
+    '#weight' => 100,
+  );
+  
   $form['actions']['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Send feedback'),
-    '#id' => 'feedback-submit',
+    '#value' => t('Submit Feedback'),
+    '#submit' => array('feedback_reloaded_form_submit'),
   );
-
-  return $form;
+	 return $form;
 }
 
+/**
+ * Submit callback.
+ * Saves a Feedback.
+ *
+ * @see feedback_reloaded_form()
+ */
+function feedback_reloaded_form_submit(&$form, &$form_state) {
+  $feedback = $form_state['subscription'];
+  
+  // Build entity.
+  entity_form_submit_build_entity('feedback_reloaded', $feedback, $form, $form_state);
+
+  // Save entity.
+  feedback_reloaded_save($feedback);
+
+  // Redirect.
+  $feedback_uri = entity_uri('feedback_reloaded', $feedback);
+  $form_state['redirect'] = $feedback_uri['path'];
+
+  // Success message.
+  drupal_set_message(t('Feedback %title saved.', array('%title' => entity_label('feedback_reloaded', $feedback))));
+}
 
 ############################
 ### API Functions - CRUD ###
@@ -291,7 +377,7 @@ function feedback_reloaded_load_by_user($account, $type_name = NULL, $reset = FA
       // Cache ids for further lookups.
       $cache[$uid] = array();
       foreach ($feedback_reloadeds as $fid => $feedback_reloaded) {
-        $cache[$uid][] = $sid;
+        $cache[$uid][] = $fid;
       }
       return $feedback_reloadeds;
     }
@@ -306,7 +392,7 @@ function feedback_reloaded_load_by_user($account, $type_name = NULL, $reset = FA
     // Manually filter, as array_filter() can't take additional parameters.
     $feedback_reloaded_filtered = array();
 
-    foreach ($cache[$uid] as $sid) {
+    foreach ($cache[$uid] as $fid) {
       if ($feedback_reloaded = feedback_reloaded_load($fid)) {
         if ($feedback_reloaded->type === $type_name) {
           $feedback_reloaded_filtered[$fid] = $feedback_reloaded;

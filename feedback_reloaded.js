@@ -79,7 +79,7 @@ var feedbackReloaded = {};
 								)
 								.appendTo($('body'));
 		
-								$('#button_highlight', $('#feedback_form')).click();
+								$('#button_highlight', $('#feedback_form_container')).click();
 								feedbackReloaded.notes++;
 			}
 						feedbackReloaded.initx=false;
@@ -372,19 +372,24 @@ var feedbackReloaded = {};
 		};
 		
 		feedbackReloaded.startPhaseOne = function() {
-				$(Drupal.settings.wizardPhaseOne)
+				$(Drupal.settings.wizardContainer)
 						.appendTo($('body'));
-				$('#button_next', $('#feedback_form'))
+    $('#wizard_form_feedbacktype', $('#feedback_form_container'))
+				  .html(Drupal.settings.wizardPhaseOneContent)
+						.css('display','block');
+		  Drupal.attachBehaviors();
+				$('#button_next', $('#feedback_form_container'))
 						.bind('click',feedbackReloaded.startPhaseTwo);
-				$('#button_cancel', $('#feedback_form')).click(function() {});
+				$('#button_cancel', $('#feedback_form_container')).click(function() {});
 		};
 		
 		feedbackReloaded.startPhaseTwo = function() {
-				$('button', $('#feedback_form')).unbind('click');
+				$('button', $('#feedback_form_container')).unbind('click');
 				$('<applet code="Screenshot.class" archive="sScreenshot.jar" codebase="'+Drupal.settings.basePath+Drupal.settings.moduleBasePath+'/jar" name="myApplet"  width="1" height ="1" style="position:absolute; left:0px; top:0px;" align="left"><PARAM name="modulePath" value="'+Drupal.settings.moduleBasePath+'"></applet>')
 				.appendTo($('body'));
-				$('#wizard_content', $('#feedback_form')).html(Drupal.settings.wizardPhaseTwo);
-				$("#feedback_form")
+		  $('#wizard_form_feedbacktype').css('display','none');
+				$('#wizard_content', $('#feedback_form_container')).html(Drupal.settings.wizardPhaseTwoContent);
+				$("#feedback_form_container")
 						.animate({
 								width: "30%",
 					height: "30%"
@@ -394,7 +399,7 @@ var feedbackReloaded = {};
 					bottom: "1%"
 			},1000)
 			.draggable();
-				$('#button_highlight', $('#feedback_form'))
+				$('#button_highlight', $('#feedback_form_container'))
 						.bind('click', function() {
 								if( feedbackReloaded.currentAction !== "highlight") {
 										feedbackReloaded.currentAction = "highlight";
@@ -403,7 +408,7 @@ var feedbackReloaded = {};
 										$('#button_addnote').removeAttr("disabled");
 					}
 						});
-				$('#button_blackout', $('#feedback_form'))
+				$('#button_blackout', $('#feedback_form_container'))
 						.bind('click', function() {
 								if( feedbackReloaded.currentAction !== "blackout") {
 										feedbackReloaded.currentAction = "blackout";
@@ -412,7 +417,7 @@ var feedbackReloaded = {};
 										$('#button_addnote').removeAttr("disabled");
 					}
 						});
-				$('#button_addnote', $('#feedback_form'))
+				$('#button_addnote', $('#feedback_form_container'))
 						.bind('click', function() {
 								if( feedbackReloaded.currentAction !== "addnote") {
 										feedbackReloaded.currentAction = "addnote";
@@ -425,7 +430,7 @@ var feedbackReloaded = {};
 		};
 		
 		feedbackReloaded.takeScreenshot = function() {
-				$("#feedback_form")
+				$("#feedback_form_container")
 						.css('display','none');
 				$("#feedback_canvas")
 						.removeAttr("onMouseMove")
@@ -435,11 +440,9 @@ var feedbackReloaded = {};
 				var currentHeight = $(window).height();
 				var currentWidth = $(window).width();
 				document.myApplet.doit(currentWidth, currentHeight);
-		
-				
 		};
 		
-		feedbackReloaded.startFeedback = function() {
+		feedbackReloaded.startFeedback = function() {	
 				$('body').bind('onselectstart', function() {return false;} );
 				$('#glass').remove();
 				$('<canvas id="feedback_canvas" width=1366 height=677 class="feedback_canvas" onMouseUp="feedbackReloaded.getMouse(this,event);" onMouseDown="feedbackReloaded.getMouse(this,event);" onMouseMove="feedbackReloaded.getMouse(this,event);" ondblclick="return false;" > Your browser does not support canvas element</canvas>')
@@ -454,31 +457,52 @@ var feedbackReloaded = {};
 		//Callback function called by applet when screenshot is ready
 		feedbackReloaded.saveScreenshot = function() {
 				feedbackReloaded.screenshotBase64 = document.myApplet.getScreenshotData();
-				$('#wizard_content', $('#feedback_form')).html(Drupal.settings.wizardPhaseThird);
-				$("#preview", $("#feedback_form"))
+				$('#wizard_form_feedback', $('#feedback_form_container'))
+				  .html(Drupal.settings.feeedbackForm)
+						.css('display' , 'block');
+				$('#wizard_content', $('#feedback_form_container'))
+				  .html("");
+				$("#preview", $("#feedback_form_container"))
 						.attr('src','data:image/png;base64,'+feedbackReloaded.screenshotBase64+'');
-				$("#feedback_form")
+				$("#feedback_form_container")
 						.draggable({ disabled: true })
 						.css('display','block')
 						.css('left','auto')
-						.css('top','auto');
-				$("#feedback_form")
+						.css('top','auto')
+						.css('position','absolute');
+				$("#feedback_form_container")
 						.animate({
 								right: "25%",
-								bottom : "10%"
-			},500)
-						.animate({
+								bottom : "10%",
 								width: "50%",
 								height: "70%"
-						},500);
-				
+			   },500, function() { 
+						var position = $(this).position();
+						  $(this)
+								  .css('left','23%')
+							   .css('top','10%')
+										.css('bottom','auto')
+										.css('right','auto')
+								  .css('height','auto');
+      });
+				$('#feedback_canvas').remove();
+				$('<div id="glass" class="glass"></div>')
+				  .appendTo($('body'));
+			 $('div[id*="note_"]').remove();
+				$('div[id*="blackout"]').remove();
+				$('div[id*="highlight_"]').remove();
+				$('div[id*="cross_"]').remove();
+				feedbackReloaded.notes =  feedbackReloaded.blackedout = 0;
+				feedbackReloaded.highlighted = [];		
 		};
 		
 		feedbackReloaded.stopFeedback = function() {
 				if($('#glass')) {
 						$('#glass').remove();
 				}
-				$('#feedback_form').remove();
+				Drupal.detachBehaviors('#feedback_form_container');
+				$('#feedback_form_container').remove();
+				
 				$('body').unbind('onselectstart');
 				$('#feedback_canvas').remove();
 				$('div[id*="note_"]').remove();
