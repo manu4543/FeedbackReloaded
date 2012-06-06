@@ -8,5 +8,4 @@
  * Extend the defaults.
  */
 class FeedbackRMetadataController extends EntityDefaultMetadataController {
-
 }

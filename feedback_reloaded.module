@@ -113,10 +113,10 @@ function feedback_reloaded_types($type_name = NULL) {
  * @param $op
  *   The operation being performed. One of 'view', 'update', 'create', 'delete'
  *   or just 'edit' (being the same as 'create' or 'update'). This isn't
- *   actually used as there is one global administer subs types permission.
+ *   actually used as there is one global administer FeedbackR types permission.
  * @param $type
- *   The subscription type we want to check access for. This isn't
- *   actually used as there is one global administer subs types permission.
+ *   The feedback type we want to check access for. This isn't
+ *   actually used as there is one global administer FeedbackR types permission.
  * @param $account
  *   The user to check for. Leave it NULL to check for the current user.
  * @return bool
@@ -137,99 +137,89 @@ function feedback_reloaded_init() {
     drupal_add_css($path . '/feedback_reloaded.css');
     drupal_add_js($path . '/feedback_reloaded.js');
    	drupal_add_library('system', 'ui.draggable');
-
- 
-				$wizardContainer = <<<EOT
-					<div id="feedback_form_container" class="feedback_form" onMouseMove="feedbackReloaded.getMouse(this,event);" onMouseUp="feedbackReloaded.getMouse(this,event);">
+  	$wizardContainer = <<<EOT
+      <div id="feedback_form_container" class="feedback_form" onMouseMove="feedbackReloaded.getMouse(this,event);" onMouseUp="feedbackReloaded.getMouse(this,event);">
       <div style="border-bottom: solid 0px #ccc; float: left; width: 100%; padding-bottom: 0px;">
         <span><img src="$path/image/close.png" style="cursor: pointer; border: solid 0px #ccc; float:right;" onClick="feedbackReloaded.stopFeedback();"></span>
-	       <img src="$path/image/fb.gif" height="30" \>&nbsp;&nbsp;<span style="font-size: 18px;">Feedback Wizard</span>
-	     </div>
-					<div id="wizard_form_feedbacktype" style="display:none;"></div>
-					<div id="wizard_form_feedback" style="display:none;"></div>
-					<div id="wizard_content"></div>
-					</div>
+        <img src="$path/image/fb.gif" height="30" \>&nbsp;&nbsp;<span style="font-size: 18px;">Feedback Wizard</span>
+      </div>
+      <div id="wizard_form_feedbacktype" style="display:none;"></div>
+      <div id="wizard_form_feedback" style="display:none;"></div>
+      <div id="wizard_content"></div>
+      </div>
 EOT;
 
     $wizardPhaseOneContent = drupal_render(drupal_get_form('feedback_type_form'));
-	   $wizardPhaseTwoContent = <<<EOT
-	  <p style="margin-top:50px;">
-	  <button id="button_highlight" style="height: 30px; " disabled>Highlight</button>
-	  Click and drag to highlight problem area.
-	  </p>
+    $wizardPhaseTwoContent = <<<EOT
+      <p style="margin-top:50px;">
+      <button id="button_highlight" style="height: 30px; " disabled>Highlight</button>
+      Click and drag to highlight problem area.
+      </p>
       <p><button id="button_blackout" style="height: 30px;">Blackout</button>
-	  Click and drag to hide personal information.
-	  </p>
+      Click and drag to hide personal information.
+      </p>
       <p><button id="button_addnote" style="height: 30px;">Add Note</button>
       Click anywhere in page to add a note there.
       </p>
-	  <div style="float:right; border-top: solid 1px #ccc; width: 100%; padding-top:9px;">
+      <div style="float:right; border-top: solid 1px #ccc; width: 100%; padding-top:9px;">
         <button id="button_cancel" style="float:right; height: 30px;" value="Cancel" onClick="feedbackReloaded.stopFeedback();">Cancel</button>
         <span style="float:right;">&nbsp;&nbsp;&nbsp;</span>
         <button id="button_preview" style="float:right; height: 30px;" value="Next" onClick="feedbackReloaded.takeScreenshot();">Preview</button>
-   </div>			
+   </div>
 EOT;
-	
-				drupal_add_js(array('wizardContainer' => $wizardContainer), 'setting');
-				drupal_add_js(array('wizardPhaseOneContent' => $wizardPhaseOneContent), 'setting');
+
+    drupal_add_js(array('wizardContainer' => $wizardContainer), 'setting');
+    drupal_add_js(array('wizardPhaseOneContent' => $wizardPhaseOneContent), 'setting');
     drupal_add_js(array('wizardPhaseTwoContent' => $wizardPhaseTwoContent), 'setting');
-	   drupal_add_js(array('moduleBasePath' => $path), 'setting');
+    drupal_add_js(array('moduleBasePath' => $path), 'setting');
   }
 }
 
-/**
- * Simple form whose ajax-enabled 'changethis' member causes a text change
- * in the description of the 'replace_textfield' member.
- * See @link http://drupal.org/node/262422 Form API Tutorial @endlink
- */
 function feedback_type_form($form, &$form_state) {
   $form = array();
-		$feedbackTypes = array();
-  
-		foreach (feedback_reloaded_get_types() as $type => $info) {
-		$key = $info->getTranslation('name');
-		$value = $info->getTranslation('label');
-  $feedbackTypes[$key] = $value;
-		}
-		
-		$form['div_tag'] = array(
+  $feedbackTypes = array();
+
+  foreach (feedback_reloaded_get_types() as $type => $info) {
+    $key = $info->getTranslation('name');
+    $value = $info->getTranslation('label');
+    $feedbackTypes[$key] = $value;
+  }
+
+  $form['div_tag'] = array(
     '#markup' => '<p style="margin-bottom:9px; margin-top:50px;">Welcome to Feedback Wizard. This wizard will let you send bug reports, new feature ideas, suggestions and other comments.<br><br>Choose one of the following feedback type.</p>',
   );
-		
+
   $form['feedbacktype'] = array(
     '#type' => 'select',
     '#options' => $feedbackTypes,
-				'#attributes' => array(
-				  'style' => 'width: 150px; text-align: center;height: 28px !important;',
-				),
-			
+    '#attributes' => array(
+      'style' => 'width: 150px; text-align: center;height: 28px !important;',
+    ),
   );
-		
-		$form['div_tag2'] = array(
+
+  $form['div_tag2'] = array(
     '#markup' => '<p style="margin-bottom:9px;">Click next then you will be able to highlight the problem area.</p>',
   );
-		
-		$form['button'] = array(
+
+  $form['button'] = array(
     '#type' => 'button',
     '#value' => t('Next'),
-				'#attributes' => array(
-				  'onclick' => 'feedbackReloaded.startPhaseTwo()',
-				),
-				'#ajax' => array(
+    '#attributes' => array(
+      'onclick' => 'feedbackReloaded.startPhaseTwo()',
+    ),
+    '#ajax' => array(
       'callback' => 'feedback_type_form_callback',
-						'event' => 'click',
-						// set progress to something else then bar and throbber, although not a standard but removes any progress indicator.
-						'progress' => 'NULL',
-     ),
+      'event' => 'click',
+      // set progress to something else then bar and throbber, although not a standard but removes any progress indicator.
+      'progress' => 'NULL',
+    ),
   );
-		
-		
-		
-		return $form;
+
+  return $form;
 }
 
 /**
- * Callback for ajax_example_simplest.
+ * Callback for feedback_type_form.
  *
  * On an ajax submit, the form builder function is called again, then the $form
  * and $form_state are passed to this callback function so it can select which
@@ -237,52 +227,52 @@ function feedback_type_form($form, &$form_state) {
  *
  * @return renderable array (the textfield element)
  */
-function feedback_type_form_callback($form, $form_state) {		
-  
-		//Create feedback form for selected feedback form type and save in Drupal.settings
-		$feedbackType = feedback_reloaded_get_types($form_state['values']['feedbacktype']);
-		$feedback = entity_create('feedback_reloaded', array('type' => $feedbackType));
-		$feedback_form = drupal_get_form('feedback_reloaded_form', $feedback);
-		drupal_add_js(array('feeedbackForm' => drupal_render($feedback_form)) , 'setting');
-		
-		//Now return the $form as it is.
+function feedback_type_form_callback($form, $form_state) {
+  //Create feedback form for selected feedback form type and save in Drupal.settings
+  $feedbackType = feedback_reloaded_get_types($form_state['values']['feedbacktype']);
+  $feedback = entity_create('feedback_reloaded', array('type' => $feedbackType));
+  $feedback_form = drupal_get_form('feedback_reloaded_form', $feedback);
+  drupal_add_js(array('feeedbackForm' => drupal_render($feedback_form)) , 'setting');
+
+  //Now return the $form as it is.
   return $form;
-} 
+}
 
 function feedback_reloaded_form($form, &$form_state, $feedback) {
   $form_state['feedback'] = $feedback;
-  $feedback_type = subs_get_types($feedback->type);
+  $feedback_type = FeedbackR_get_types($feedback->type);
   $aid = entity_id('feedback_reloaded', $feedback);
-		$administer_feedback_reloaded = user_access('administer feedback');
-		
-		field_attach_form('feedback_reloaded', $feedback, $form, $form_state);  
+  $administer_feedback_reloaded = user_access('administer feedback');
+
+  field_attach_form('feedback_reloaded', $feedback, $form, $form_state);
 
   $form['div_tag'] = array(
     '#markup' => '<p style="margin-top:50px; margin-bottom:9px;">Please give us the brief desciption reagarding your feedback.</p>',
   );
-		
+
   $form['message'] = array(
-		  '#type' => 'textarea',
- 			'#required' => TRUE,
-				'#attributes' => array(
-				  'style' => 'width: 500px;',
-				),
-		);
-  
-		$form['preview'] = array(
+    '#type' => 'textarea',
+    '#required' => TRUE,
+    '#attributes' => array(
+      'style' => 'width: 500px;',
+    ),
+  );
+
+  $form['preview'] = array(
     '#markup' => '<p><strong>Screenshot Preview</strong><br><img id="preview" class="preview_div" src=""></img></p>'
   );
-		
+
   $form['actions'] = array(
     '#weight' => 100,
   );
-  
+
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Submit Feedback'),
     '#submit' => array('feedback_reloaded_form_submit'),
   );
-	 return $form;
+
+  return $form;
 }
 
 /**
@@ -292,8 +282,8 @@ function feedback_reloaded_form($form, &$form_state, $feedback) {
  * @see feedback_reloaded_form()
  */
 function feedback_reloaded_form_submit(&$form, &$form_state) {
-  $feedback = $form_state['subscription'];
-  
+  $feedback = $form_state['feedback'];
+
   // Build entity.
   entity_form_submit_build_entity('feedback_reloaded', $feedback, $form, $form_state);
 
@@ -313,10 +303,10 @@ function feedback_reloaded_form_submit(&$form, &$form_state) {
 ############################
 
 /**
- * Fetch a subscription object.
+ * Fetch a feedback object.
  *
  * @param $fid
- *   Integer specifying the subscription id.
+ *   Integer specifying the feedback id.
  * @param $reset
  *   A boolean indicating that the internal cache should be reset.
  * @return
@@ -330,16 +320,16 @@ function feedback_reloaded_load($fid, $reset = FALSE) {
 }
 
 /**
- * Load multiple subscriptions based on certain conditions.
+ * Load multiple feedbacks based on certain conditions.
  *
  * @param $sids
- *   An array of subscription IDs.
+ *   An array of feedback IDs.
  * @param $conditions
- *   An array of conditions to match against the {subs} table.
+ *   An array of conditions to match against the {FeedbackR} table.
  * @param $reset
  *   A boolean indicating that the internal cache should be reset.
  * @return array|FALSE
- *   An array of subscription objects, indexed by ID or FALSE of none were found.
+ *   An array of feedback objects, indexed by ID or FALSE of none were found.
  *
  * @see entity_load()
  * @see feedback_reloaded_load()
@@ -350,23 +340,23 @@ function feedback_reloaded_load_multiple($fids = array(), $conditions = array(),
 }
 
 /**
- * Fetch subscriptions by account.
+ * Fetch feedbacks by account.
  *
  * @param $account
- *   The user account to load subscriptions for, or its uid.
+ *   The user account to load feedbacks for, or its uid.
  * @param $type_name
- *   To load subscriptions of a single type, specify it.
+ *   To load feedbacks of a single type, specify it.
  * @param $reset
  *   To bypass the static cache set this to true.
- * @return Subs|array|FALSE
- *   Either a single subscription or an array of subscriptions keyed by
- *   subscription type or FALSE of no subscriptions found.
+ * @return FeedbackR|array|FALSE
+ *   Either a single feedback or an array of feedbacks keyed by
+ *   feedback type or FALSE of no feedbacks found.
  *
  * @see feedback_reloaded_load_multiple()
  */
 function feedback_reloaded_load_by_user($account, $type_name = NULL, $reset = FALSE) {
-  // Use a separate query to determine all subscription ids per user and cache them.
-  // That way we can look up subscriptions by id and benefit from the static cache
+  // Use a separate query to determine all feedback ids per user and cache them.
+  // That way we can look up feedbacks by id and benefit from the static cache
   // of the entity loader.
   $cache = &drupal_static(__FUNCTION__, array());
   $uid = is_object($account) ? $account->uid : $account;
@@ -403,31 +393,31 @@ function feedback_reloaded_load_by_user($account, $type_name = NULL, $reset = FA
     return $feedback_reloaded_filtered;
   }
 
-  // Return an array containing subscriptions keyed by subscription id.
+  // Return an array containing feedbacks keyed by feedback id.
   return feedback_reloaded_load_multiple($cache[$uid]);
 }
 
 /**
- * Deletes a subscription.
+ * Deletes a feedback.
  * Set it to cancelled before to trigger any relevant events.
  *
- * @param Subs
- *   The subscription object.
+ * @param FeedbackR
+ *   The feedback object.
 */
 function feedback_reloaded_delete(FeedbackR $feedback_reloaded) {
   //feedback_reloaded_set_cancelled($feedback_reloaded);
   $feedback_reloaded->delete();
 }
- 
+
 /**
- * Delete multiple subscriptions.
+ * Delete multiple feedbacks.
  *
  * @param array
- *   An array of subscription IDs.
+ *   An array of feedback IDs.
  */
 function feedback_reloaded_delete_multiple(array $fids) {
   // Bypass the traditional entity_get_controller() approach because we
-  // need to cancel each subscription before its deleted.
+  // need to cancel each feedback before its deleted.
   foreach ($fids as $fid) {
     if ($feedback_reloaded = feedback_reloaded_load($fid)) {
       feedback_reloaded_delete($feedback_reloaded);
@@ -436,24 +426,24 @@ function feedback_reloaded_delete_multiple(array $fids) {
 }
 
 /**
- * Create a new subscription object.
+ * Create a new feedback object.
  *
  * @param $values
- *   An array of values to initialize the subscription with.
- * @return Subs
- *   The newly-created subscription object.
+ *   An array of values to initialize the feedback with.
+ * @return FeedbackR
+ *   The newly-created feedback object.
  */
 function feedback_reloaded_create(array $values) {
   return new FeedbackR($values);
 }
 
 /**
- * Saves a subscription.
+ * Saves a feedback.
  *
  * @param $feedback_reloaded
- *   The subscription object.
+ *   The feedback object.
  * @return boolean
- *   Whether the subscription was saved successfully.
+ *   Whether the feedback was saved successfully.
  */
 function feedback_reloaded_save(FeedbackR $feedback_reloaded) {
   return $feedback_reloaded->save();
@@ -495,12 +485,12 @@ function feedback_reloaded_type_delete_multiple($type_ids) {
 }
 
 /**
- * Returns an array of all subscription types, keyed by the type name.
+ * Returns an array of all feedback types, keyed by the type name.
  *
  * @param $type_name
  *   If set, the type with the given name is returned.
- * @return SubsType[]
- *   Depending whether $type isset, an array of subscription types or a
+ * @return FeedbackRType[]
+ *   Depending whether $type isset, an array of feedback types or a
  *   single one.
  */
 function feedback_reloaded_get_types($type_name = NULL) {
