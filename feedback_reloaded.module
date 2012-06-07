@@ -136,8 +136,8 @@ function feedback_reloaded_init() {
     $path = drupal_get_path('module', 'feedback_reloaded');
     drupal_add_css($path . '/feedback_reloaded.css');
     drupal_add_js($path . '/feedback_reloaded.js');
-   	drupal_add_library('system', 'ui.draggable');
-  	$wizardContainer = <<<EOT
+    drupal_add_library('system', 'ui.draggable');
+    $wizardContainer = <<<EOT
       <div id="feedback_form_container" class="feedback_form" onMouseMove="feedbackReloaded.getMouse(this,event);" onMouseUp="feedbackReloaded.getMouse(this,event);">
       <div style="border-bottom: solid 0px #ccc; float: left; width: 100%; padding-bottom: 0px;">
         <span><img src="$path/image/close.png" style="cursor: pointer; border: solid 0px #ccc; float:right;" onClick="feedbackReloaded.stopFeedback();"></span>
@@ -240,7 +240,7 @@ function feedback_type_form_callback($form, $form_state) {
 
 function feedback_reloaded_form($form, &$form_state, $feedback) {
   $form_state['feedback'] = $feedback;
-  $feedback_type = FeedbackR_get_types($feedback->type);
+  $feedback_type = feedback_reloaded_get_types($feedback->type);
   $aid = entity_id('feedback_reloaded', $feedback);
   $administer_feedback_reloaded = user_access('administer feedback');
 
