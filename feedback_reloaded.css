@@ -15,11 +15,6 @@
   margin-bottom: -2px;
 }
 
-.preview_screenshot {
-  width:250px;
-  height: 150px;
-}
-
 .highlighted_region {
   display:block;
   position:fixed;
@@ -93,8 +88,8 @@
   border: solid 1px #666;
 }
 
-.preview_div {
-  width: 50%;
+#screenshot_preview {
+  width: 100%;
   height: 35%;
 }
 

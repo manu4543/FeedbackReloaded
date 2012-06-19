@@ -34,7 +34,7 @@ function feedback_reloaded_schema() {
         'not null' => TRUE,
       ),
       'type' => array(
-        'description' => 'The {feedback_reloaded_type}.type of this subscription.',
+        'description' => 'The {feedback_reloaded_type}.name of this subscription.',
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
@@ -61,16 +61,6 @@ function feedback_reloaded_schema() {
         'size' => 'big',
         'not null' => TRUE,
       ),
-      'location' => array(
-        'description' => 'System path of the originating page.',
-        'type' => 'text',
-        'not null' => TRUE,
-      ),
-      'location_masked' => array(
-        'description' => 'Untranslated system path of the originating page.',
-        'type' => 'text',
-        'not null' => TRUE,
-      ),
       'url' => array(
         'description' => 'Absolute URL of the originating page.',
         'type' => 'text',
@@ -90,10 +80,6 @@ function feedback_reloaded_schema() {
       ),
     ),
     'primary key' => array('fid'),
-    'indexes' => array(
-      'location' => array(array('location', 32)),
-      'location_masked' => array(array('location_masked', 32)),
-    ),
   );
 
   $schema['feedback_reloaded_type'] = array(

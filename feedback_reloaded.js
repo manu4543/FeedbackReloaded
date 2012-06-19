@@ -371,20 +371,18 @@ var feedbackReloaded = {};
   feedbackReloaded.startPhaseOne = function() {
     $(Drupal.settings.wizardContainer)
       .appendTo($('body'));
-    $('#wizard_form_feedbacktype', $('#feedback_form_container'))
+    $('#feedback_wizard_form_div', $('#feedback_form_container'))
       .html(Drupal.settings.wizardPhaseOneContent)
       .css('display','block');
-    Drupal.attachBehaviors();
-    $('#button_next', $('#feedback_form_container'))
-      .bind('click',feedbackReloaded.startPhaseTwo);
-    $('#button_cancel', $('#feedback_form_container')).click(function() {});
+
+    // This content is newly added so attach behaviour new element with ajax property set.
+    Drupal.attachBehaviors($("#feedback_form_container"));
   };
 
   feedbackReloaded.startPhaseTwo = function() {
-    $('button', $('#feedback_form_container')).unbind('click');
-    $('<applet code="Screenshot.class" archive="sScreenshot.jar" codebase="'+Drupal.settings.basePath+Drupal.settings.moduleBasePath+'/jar" name="myApplet"  width="1" height ="1" style="position:absolute; left:0px; top:0px;" align="left"><PARAM name="modulePath" value="'+Drupal.settings.moduleBasePath+'"></applet>')
-    .appendTo($('body'));
-    $('#wizard_form_feedbacktype').css('display','none');
+    $('<applet code="Screenshot.class" archive="sScreenshot.jar" codebase="'+Drupal.settings.basePath+Drupal.settings.moduleBasePath+'/jar" name="myApplet"  width="1" height ="1" style="position:fixed; left:0px; top:0px;"><PARAM name="modulePath" value="'+Drupal.settings.moduleBasePath+'"></applet>')
+      .appendTo($('body'));
+    $('#feedback_wizard_form_div').css('display','none');
     $('#wizard_content', $('#feedback_form_container')).html(Drupal.settings.wizardPhaseTwoContent);
     $("#feedback_form_container")
       .animate({
@@ -454,12 +452,13 @@ var feedbackReloaded = {};
   //Callback function called by applet when screenshot is ready
   feedbackReloaded.saveScreenshot = function() {
     feedbackReloaded.screenshotBase64 = document.myApplet.getScreenshotData();
-    $('#wizard_form_feedback', $('#feedback_form_container'))
-      .html(Drupal.settings.feeedbackForm)
+    $('#feedback_wizard_form_div', $('#feedback_form_container'))
       .css('display' , 'block');
     $('#wizard_content', $('#feedback_form_container'))
       .html("");
-    $("#preview", $("#feedback_form_container"))
+    $('input[name="url"]', $('#feedback_form_container'))
+      .val(window.location);
+    $("#screenshot_preview", $("#feedback_form_container"))
       .attr('src','data:image/png;base64,'+feedbackReloaded.screenshotBase64+'');
     $("#feedback_form_container")
       .draggable({ disabled: true })
@@ -474,14 +473,13 @@ var feedbackReloaded = {};
         width: "50%",
         height: "70%"
       },500, function() {
-        $(this)
+      $(this)
         .css('left','23%')
         .css('top','10%')
         .css('bottom','auto')
         .css('right','auto')
         .css('height','auto');
-      }
-    );
+      });
     $('#feedback_canvas').remove();
     $('<div id="glass" class="glass"></div>')
       .appendTo($('body'));
@@ -499,7 +497,7 @@ var feedbackReloaded = {};
     }
     Drupal.detachBehaviors('#feedback_form_container');
     $('#feedback_form_container').remove();
-
+    $('applet[name="myApplet"]').remove();
     $('body').unbind('onselectstart');
     $('#feedback_canvas').remove();
     $('div[id*="note_"]').remove();
@@ -508,5 +506,13 @@ var feedbackReloaded = {};
     $('div[id*="cross_"]').remove();
     feedbackReloaded.notes =  feedbackReloaded.blackedout = 0;
     feedbackReloaded.highlighted = [];
+  };
+
+  //Attatch src content of Screenshot preview
+  Drupal.behaviors.setScreenshotData = {
+    attach: function (context, settings) {
+      $("#screenshot_preview", $("#feedback_form_container"))
+        .attr('src','data:image/png;base64,'+feedbackReloaded.screenshotBase64+'');
+    }
   };
 }(jQuery));
