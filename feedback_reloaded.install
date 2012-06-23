@@ -66,6 +66,11 @@ function feedback_reloaded_schema() {
         'type' => 'text',
         'not null' => TRUE,
       ),
+      'screenshoturl' => array(
+        'description' => 'Absolute URL of the screenshot using file_create_url.',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
       'useragent' => array(
         'description' => 'User agent of the feedback message author.',
         'type' => 'varchar',

@@ -255,6 +255,8 @@ function feedback_reloaded_form($form, &$form_state, $feedback) {
     '#markup' => '<p><strong>Screenshot Preview</strong><br><img id="screenshot_preview" src=""></img></p>'
   );
 
+  $form['screenshot'] = array('#type' => 'hidden');
+
   $form['message'] = array(
     '#title' => 'Description',
     '#type' => 'textarea',
@@ -293,7 +295,9 @@ function feedback_reloaded_form_callback(&$form, &$form_state) {
   }
 
   $feedback = $form_state['feedback'];
-
+  $screenshot = $form_state['values']['screenshot'];
+  //Now decode this base64 encoded date and store in $screenshot
+  $screenshot = base64_decode($screenshot);
   $defaults = array(
       'uid' => $user->uid,
       'timestamp' => REQUEST_TIME,
@@ -309,9 +313,23 @@ function feedback_reloaded_form_callback(&$form, &$form_state) {
   // Build entity.
   entity_form_submit_build_entity('feedback_reloaded', $feedback, $form, $form_state);
 
+  //Save screenshot
+  $data = $screenshot;
+  $uri = "public://screenshot.png";
+
+  // Managed operations work with a file object.
+  $file_object = file_save_data($data, $uri, FILE_EXISTS_RENAME);
+  if (!empty($file_object)) {
+    $url = file_create_url($file_object->uri);
+    $feedback->screenshoturl = $url;
+  }
+  else {
+    form_set_error('k','Screenshot could not be saved.');
+    return $form;
+  }
+
   // Save entity.
   feedback_reloaded_save($feedback);
-
   $status = "<p style=\"margin-bottom:9px; margin-top:50px;\">";
   $status .= "Feedback Submitted Succesfully. Thanks for your feedback.<br><br><button onclick = \"feedbackReloaded.stopFeedback();\" value = \"Finish\">Finish</button>";
   $status .= "</p>";

@@ -458,6 +458,8 @@ var feedbackReloaded = {};
       .html("");
     $('input[name="url"]', $('#feedback_form_container'))
       .val(window.location);
+    $('input[name="screenshot"]', $('#feedback_form_container'))
+      .val(feedbackReloaded.screenshotBase64);
     $("#screenshot_preview", $("#feedback_form_container"))
       .attr('src','data:image/png;base64,'+feedbackReloaded.screenshotBase64+'');
     $("#feedback_form_container")
