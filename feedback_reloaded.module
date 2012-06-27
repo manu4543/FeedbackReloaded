@@ -148,7 +148,8 @@ function feedback_reloaded_init() {
       </div>
 EOT;
 
-    $wizardPhaseOneContent = drupal_render(drupal_get_form('feedback_wizard_form'));
+    $wizardform = drupal_get_form('feedback_wizard_form');
+    $wizardPhaseOneContent = drupal_render($wizardform);
     $wizardPhaseTwoContent = <<<EOT
       <p style="margin-top:50px;">
       <button id="button_highlight" style="height: 30px; " disabled>Highlight</button>
