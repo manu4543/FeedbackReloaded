@@ -80,8 +80,6 @@ function feedback_reloaded_entity_info() {
     'metadata controller class' => 'FeedbackRMetadataController',
   );
 
-
-
   return $return;
 }
 
@@ -99,6 +97,207 @@ function feedback_reloaded_entity_info_alter(&$entity_info) {
       ),
     );
   }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function feedback_reloaded_menu() {
+  $items = array();
+
+  $items['admin/reports/feedback'] = array(
+    'title' => 'Feedbacks',
+    'description' => t('View feedbacks submitted by users.'),
+    'page callback' => 'feedback_reloaded_list',
+    'access arguments' => array('view feedback messages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $feedback_uri = 'feedback/%feedback_reloaded';
+  $feedback_uri_argument_position = 1;
+
+  // View feedback.
+  $items[$feedback_uri] = array(
+    'title callback' => 'feedback_reloaded_page_title',
+    'title arguments' => array($feedback_uri_argument_position),
+    'page callback' => 'feedback_reloaded_view',
+    'page arguments' => array($feedback_uri_argument_position),
+    'access callback' => 'entity_access',
+    'access arguments' => array('view', 'feedback_reloaded', $feedback_uri_argument_position),
+  );
+
+  $items[$feedback_uri . '/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  //Change review status of feedback.
+  $items[$feedback_uri . '/changestatus'] = array(
+    'title' => 'Edit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('feedback_reloaded_changestatus_form', $feedback_uri_argument_position),
+    'access callback' => 'entity_access',
+    'access arguments' => array('edit', 'feedback_reloaded', $feedback_uri_argument_position),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+
+  // Delete feedback.
+  $items[$feedback_uri . '/delete'] = array(
+    'title' => 'Delete Feedback',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('feedback_reloaded_delete_form', $feedback_uri_argument_position),
+    'access callback' => 'entity_access',
+    'access arguments' => array('edit', 'feedback_reloaded', $feedback_uri_argument_position),
+  );
+
+  return $items;
+
+}
+
+/**
+ * Page callback.
+ * Lists all subscriptions.
+ *
+ */
+function feedback_reloaded_list() {
+
+  $rows = array();
+
+  // Build the sortable table header.
+  $header = array(
+    'uid' => array(
+      'data' => 'User',
+      'type' => 'property',
+      'specifier' => 'uid',
+    ),
+    'type' => array(
+      'data' => 'Type',
+      'type' => 'entity',
+      'specifier' => 'type',
+    ),
+    'status' => array(
+      'data' => 'Status',
+      'type' => 'property',
+      'specifier' => 'status',
+    ),
+    'date_created' => array(
+      'data' => 'Created',
+      'type' => 'property',
+      'specifier' => 'timestamp',
+      'sort' => 'asc',
+    ),
+    'message' => array(
+      'data' => 'Description',
+      'type' => 'property',
+      'specifier' => 'message',
+    ),
+    'useragent' => array(
+      'data' => 'Useragent',
+      'type' => 'property',
+      'specifier' => 'useragent',
+    ),
+    'operations' => array(
+      'data' => t('Operations')
+    ),
+  );
+
+  //$filters = feedback_reloaded_get_filter();
+
+  $query = new EntityFieldQuery();
+  $query
+    ->entityCondition('entity_type', 'feedback_reloaded')
+    ->tableSort($header)
+    ->pager('20');
+
+  if (!empty($filters['type'])) {
+    $query->entityCondition('bundle', $filters['type'], 'IN');
+  }
+
+  if (!empty($filters['status'])) {
+    $query->propertyCondition('status', $filters['status'], 'IN');
+  }
+
+  $result = $query->execute();
+  if (!empty($result)) {
+    $feedbacks = feedback_reloaded_load_multiple(array_keys($result['feedback_reloaded']));
+  }
+  else {
+    $feedbacks = array();
+  }
+
+  $destination = drupal_get_destination();
+  $feedback_types = feedback_reloaded_get_types();
+  $status_options = array(
+    '0' => t('New'),
+    '1' => t('Processed'),
+  );
+
+  $destination = drupal_get_destination();
+  foreach ($feedbacks as $feedback) {
+    $user = user_load($feedback->uid);
+
+    $rows[$feedback->fid] = array(
+      'uid' => array(
+        'data' => array(
+          '#type' => 'link',
+          '#title' => $user->name,
+          '#href' => 'user/' . $feedback->uid,
+        ),
+      ),
+      'type' => feedback_reloaded_type_types($feedback->type)->label,
+      'status' => $status_options[$feedback->status],
+      'date_created' => format_date($feedback->timestamp),
+      'message' => substr($feedback->message,0,30),
+      'useragent' => substr($feedback->useragent,0,30).'...',
+    );
+
+    // Build a list of operations.
+    $operations = array();
+
+    $operations['view'] = array(
+      'title' => t('view'),
+      'href' => 'feedback/' . $feedback->fid,
+      'query' => $destination,
+    );
+
+    $operations['delete'] = array(
+      'title' => t('delete'),
+      'href' => 'feedback/' . $feedback->fid . '/delete',
+      'query' => $destination,
+    );
+
+    $operations['changestatus'] = array(
+      'title' => t('change status'),
+      'href' => 'feedback/' . $feedback->fid . '/changestatus',
+      'query' => $destination,
+    );
+
+    // Render an unordered list of operations links.
+    $rows[$feedback->fid]['operations'] = array(
+      'data' => array(
+        '#theme' => 'links',
+        '#links' => $operations,
+        '#attributes' => array('class' => array('links', 'inline')),
+      ),
+    );
+  }
+
+  $output = array(
+    //'subs_filter_form' => drupal_get_form('subs_filter_form'),
+    'feedback_reloaded_content' => array(
+      '#theme' => 'table',
+      '#header' => $header,
+      '#rows' => $rows,
+      '#empty' => t('There are no subscriptions available.'),
+    ),
+    'pager' => array(
+      '#theme' => 'pager',
+    ),
+  );
+
+  return $output;
 }
 
 function feedback_reloaded_types($type_name = NULL) {
@@ -290,6 +489,7 @@ function feedback_reloaded_form($form, &$form_state, $feedback) {
  */
 function feedback_reloaded_form_callback(&$form, &$form_state) {
   // If there was a form validation error, re-render the entire form.
+  global $user;
   $error = form_get_errors();
   if($error) {
     return $form;
@@ -338,9 +538,89 @@ function feedback_reloaded_form_callback(&$form, &$form_state) {
   $commands[] = ajax_command_remove('#feedback_wizard_form_div');
   $commands[] = ajax_command_html('#wizard_content', $status);
   return array('#type' => 'ajax', '#commands' => $commands);
-  return $status;
 }
 
+/**
+ * Form callback.
+ * Displays feedback delete confirmation form.
+ *
+ * @see feedback_reloaded_menu()
+ */
+function feedback_reloaded_delete_form($form, &$form_state, $feedback) {
+  $form_state['feedback'] = $feedback;
+
+  // Always provide entity id in the same form key as in the entity edit form.
+  $form['aid'] = array('#type' => 'value', '#value' => entity_id('feedback_reloaded', $feedback));
+  $feedback_uri = entity_uri('subs', $feedback);
+  return confirm_form($form, t('Are you sure you want to delete feedback %title?', array('%title' => entity_label('feedback_reloaded', $feedback))), $feedback_uri['path'], t('This action cannot be undone.'), t('Delete'), t('Cancel'));
+}
+
+/**
+ * Submit handler.
+ * Deletes an feedback.
+ *
+ * @see feedback_reloaded_delete_form()
+ */
+function feedback_reloaded_delete_form_submit($form, &$form_state) {
+  $feedback = $form_state['feedback'];
+
+  // Delete feedback.
+  feedback_reloaded_delete($feedback);
+
+  // Redirect to front page.
+  $form_state['redirect'] = '<front>';
+
+  // Success message.
+  drupal_set_message(t('Feedback %title deleted.', array('%title' => entity_label('feedback_reloaded', $feedback))));
+}
+
+function feedback_reloaded_changestatus_form($form, &$form_state, $feedback) {
+  $feedback_type = feedback_reloaded_type_types($feedback->type);
+  $form_state['feedback'] = $feedback;
+  $form['message'] = array(
+    '#title' => 'Description',
+    '#type' => 'textarea',
+    '#required' => TRUE,
+    '#description' => t('Please give us the brief desciption reagarding your feedback'),
+    '#default_value' => $feedback->message,
+  );
+
+  $option = array(0 => t('New'), 1 => t('Processed'));
+  $form['status'] = array(
+    '#type' => 'radios',
+    '#title' => t('Status'),
+    '#default_value' => $feedback->status,
+    '#options' => $option,
+    '#description' => t('Mark a feedback as processed after reviewing it.'),
+  );
+
+  field_attach_form('feedback_reloaded', $feedback, $form, $form_state);
+
+  $form['actions'] = array(
+    '#weight' => 100,
+  );
+
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save feedback'),
+    '#submit' => array('feedback_reloaded_changestatus_form_submit'),
+  );
+
+  return $form;
+}
+
+function feedback_reloaded_changestatus_form_submit($form, &$form_state) {
+  $feedback = $form_state['feedback'];
+
+  // Build entity.
+  entity_form_submit_build_entity('feedback_reloaded', $feedback, $form, $form_state);
+
+  // Save entity.
+  feedback_reloaded_save($feedback);
+
+  // Success message.
+  drupal_set_message(t('Feedback %title saved.', array('%title' => entity_label('feedback_reloaded', $feedback))));
+}
 ############################
 ### API Functions - CRUD ###
 ############################
@@ -525,6 +805,38 @@ function feedback_reloaded_type_delete($type) {
 */
 function feedback_reloaded_type_delete_multiple($type_ids) {
   entity_delete_multiple('feedback_reloaded_type', $type_ids);
+}
+
+/**
+ * Feedback view callback.
+ * Displays a feedback entity.
+ *
+ *
+ * @param FeedbackR
+ *   The $feedback we want to view.
+ * @return string
+ *   The rendered feedback entity.
+ *
+ * @see feedback_reloaded_menu()
+ */
+function feedback_reloaded_view(FeedbackR $feedback) {
+  drupal_set_title(entity_label('feedback_reloaded', $feedback));
+  return entity_view('feedback_reloaded', array(entity_id('feedback_reloaded', $feedback) => $feedback), 'full');
+}
+
+/**
+ * Menu title callback.
+ * Returns page title for feedback-related menu items.
+ *
+ * @param FeedbackR
+ *   The $feedback we want to get a title for.
+ * @return string
+ *   The feedback's label.
+ *
+ * @see feedback_reloaded_menu()
+ */
+function feedback_reloaded_page_title(FeedbackR $feedback) {
+  return $feedback->label();
 }
 
 /**

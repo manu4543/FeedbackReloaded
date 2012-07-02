@@ -6,6 +6,25 @@
  */
 
 class FeedbackRController extends EntityAPIController {
+
+  /**
+   * Add properties as pseudo-fields.
+   */
+  public function buildContent($entity, $view_mode = 'full', $langcode = NULL, $content = array()) {
+    $user = user_load($entity->uid);
+    $status_options = array(
+    '0' => t('New'),
+    '1' => t('Processed'),
+    );
+    $content['created By'] = array('#markup' => t('<b>Submitted by: </b><a href="!link">!user</a><br>', array('!user' => $user->name, '!link' => 'user/'.$user->uid)));
+    $content['created on'] = array('#markup' => t('<b>Date of submission:</b> !created<br>', array('!created' => format_date($entity->timestamp))));
+    $content['status'] = array('#markup' => t('<b>Status:</b> !status<br>', array('!status' => $status_options[$entity->status])));
+    $content['location'] = array('#markup' => t('<b>Location:</b> <a href="!location">!location</a><br>', array('!location' => $entity->url)));
+    $content['message'] = array('#markup' => t('<b>Problem Description:</b><br> !message<br>', array('!message' => $entity->message)));
+    $content['useragent'] = array('#markup' => t('<b>Useragent:</b><br> !useragent<br>', array('!useragent' => $entity->useragent)));
+    $content['screenshot'] = array('#markup' => t('<b>Screenshot (click on image to see in full size):</b> <br><a href="!link"><img style="width: 100%; height: 50%;" title="Click to see full size image" src="!link"></a>', array('!link' => $entity->screenshoturl)));
+    return parent::buildContent($entity, $view_mode, $langcode, $content);
+  }
 }
 
 class FeedbackRTypeController extends EntityAPIControllerExportable {
@@ -24,9 +43,11 @@ class FeedbackR extends Entity {
     }
     parent::__construct($values, 'feedback_reloaded');
   }
-		
+
   protected function defaultLabel() {
-    return $this->title;
+    $username = isset($this->uid) ? user_load($this->uid)->name : 'username';
+    $type_label = feedback_reloaded_get_types($this->type)->getTranslation('label');
+    return t('@type type Feedback by @username', array('@type' => $type_label, '@username' => $username));
   }
 
   protected function defaultUri() {
