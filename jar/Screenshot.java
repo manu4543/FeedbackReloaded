@@ -44,7 +44,7 @@ public class Screenshot extends Applet
         takeScreenshot();
       }
       try {
-        Thread.sleep(1000L);
+        Thread.sleep(100L);
       }
       catch (Exception localException) {
         System.out.println(localException.toString());
@@ -61,7 +61,9 @@ public class Screenshot extends Applet
     try {
       Robot localRobot = new Robot();
       Rectangle localRectangle1 = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+			System.out.println("calling start");
       BufferedImage localBufferedImage = localRobot.createScreenCapture(localRectangle1);
+			System.out.println("done");
       Point localPoint = getLocationOnScreen();
       System.out.println(localPoint.x + " " + localPoint.y + " " + this.currentWidth + " " + this.currentHeight);
       Rectangle localRectangle2 = new Rectangle(localPoint.x, localPoint.y, this.currentWidth, this.currentHeight);
