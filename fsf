@@ -1,0 +1,187 @@
+[33mcommit ec4d0f8283698fbd358947326e33071589dc0eb4[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Mon Jul 2 15:07:55 2012 +0530
+
+    Decreased thread sleeping time now taking screenshot takes less time
+
+[33mcommit 28ff43aa4f137e755983c9f8162037924071b32e[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Mon Jul 2 15:04:39 2012 +0530
+
+    feedback report can be seen at admin/reports/feedback
+
+[33mcommit 0dffd17b312f66324c5e0bd4b94d262a7bc2d2a2[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Wed Jun 27 23:34:06 2012 +0530
+
+    Issue #1658856
+
+[33mcommit a1a43b3c65e484d9cdcbc7848a8a905b26af5ea2[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Sat Jun 23 19:54:06 2012 +0530
+
+    Change in schema and now screenshot is saved in public:// directory
+
+[33mcommit 895a23e6897ab85b5916ab919c434ec8cad31a09[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Tue Jun 19 16:59:09 2012 +0530
+
+    Issue #1620158 and now user can submit feedback
+
+[33mcommit 086107077b859678d6fbd8a00dc6ff70011133e9[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Thu Jun 7 10:48:34 2012 +0530
+
+    Remove error in .module file
+
+[33mcommit 13ec337758c71f29da0eb0b87d13850da72e96fd[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Wed Jun 6 23:55:21 2012 +0530
+
+    Properly Indented code
+
+[33mcommit 16058113f68bc182bbb2bea9e3966e2d0b888caa[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Wed Jun 6 18:36:47 2012 +0530
+
+    write feedback_reloaded_form, now user can select feedback_type in wizard
+
+[33mcommit b27449632fa84682afccfb6159b8b8d892a35369[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Fri Jun 1 19:37:16 2012 +0530
+
+    Fixed page not found on manage field and manage display
+
+[33mcommit 42c761fb160d78a5651c74039df0ce64cd068ea2[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Fri Jun 1 12:17:10 2012 +0530
+
+    CRUD callbacks
+
+[33mcommit 979814f166bff1cccb03525b7a09fd84dbf195a4[m
+Author: Alex Weber <alexweber15@gmail.com>
+Date:   Tue May 29 15:26:38 2012 -0300
+
+    add title to description field in feedback type form
+
+[33mcommit 8e64c5a1bebe3f98eb39360c7145ed63f555555d[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Tue May 29 21:39:52 2012 +0530
+
+    small fix in feedback type editing form
+
+[33mcommit 9d99290ea756f5ca5d3f8fbb396818808f753acb[m
+Author: Alex Weber <alexweber15@gmail.com>
+Date:   Tue May 29 12:16:40 2012 -0300
+
+    small fixes to entity implementation
+
+[33mcommit 4c04a7419f85478d256b16441d30d4f3aee68273[m
+Author: Alex Weber <alexweber15@gmail.com>
+Date:   Tue May 29 12:03:56 2012 -0300
+
+    fix code formatting
+
+[33mcommit cf401918836b47f67d30263aeb77ae89a3eba6f9[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Mon May 28 17:36:41 2012 +0530
+
+    Issue #1592788: Created Feedback entity
+
+[33mcommit 2d26ef6fc3aabf364764289fde075ab4acf26309[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Thu May 24 22:11:02 2012 +0530
+
+    Corrected Wizard form
+
+[33mcommit d631243f0b68c9f90f57730e0b8d0897d028405b[m
+Merge: 580f854 11a0c67
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Thu May 24 20:36:48 2012 +0530
+
+    Implemented Screenshot functionality
+
+[33mcommit 580f85408f91e577672b5ae0534257db99028e18[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Tue May 22 01:10:43 2012 +0530
+
+    Removed error in closeFeedback
+
+[33mcommit 11a0c677ad7b88bd60531374dec82cff0a96cac3[m
+Author: Alex Weber <alexweber15@gmail.com>
+Date:   Mon May 21 12:17:58 2012 -0300
+
+    added code comments for manu in css and js
+
+[33mcommit 45927fb3cc01f175dee0c76a2fe56e4993ad70cd[m
+Author: Alex Weber <alexweber15@gmail.com>
+Date:   Mon May 21 11:39:47 2012 -0300
+
+    added some code comments for manu
+
+[33mcommit 36d338d9138db91a50e58b3f33187105d5d3abca[m
+Author: Alex Weber <alexweber15@gmail.com>
+Date:   Mon May 21 11:39:39 2012 -0300
+
+    properly indent code in js include
+
+[33mcommit 95dcb68f93af838d2fca96c7f450e911d9cdf426[m
+Author: Alex Weber <alexweber15@gmail.com>
+Date:   Mon May 21 11:39:27 2012 -0300
+
+    don't need to include license file, Drupal.org's packaging script does that automatically
+
+[33mcommit 810f51510a83eb4b4ef642a628ab767714078357[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Sat May 19 20:01:30 2012 +0530
+
+    Implemented Add Notes Feature and some code cleanup.
+
+[33mcommit 99732e77285dcdfd6b4154962b1243c6edcef2cc[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Mon May 14 20:39:02 2012 +0530
+
+    Updated .info file
+
+[33mcommit bd2bbd4e118ff473ce70e8be2153336a6808abd7[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Mon May 14 20:29:02 2012 +0530
+
+    Implemented blackout feature and new GUI for feedback.
+
+[33mcommit bb3de81ddbdc43b68940b29e735848243f00573c[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Sat May 12 14:30:36 2012 +0530
+
+    Permission setting
+
+[33mcommit d0960861abce1b673d24947de5f84e3a4f562cfb[m
+Merge: 68a1c6b b400ff2
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Thu May 10 17:55:38 2012 +0530
+
+    Issue #[1566536] by [manu4543]: Cleaned up javascript and fixed IE issue
+
+[33mcommit 68a1c6b192990c1347e8dba64628d0d09b8dad23[m
+Author: Manu Chaudhary <manu_talkin@yahoo.com>
+Date:   Thu May 10 17:34:33 2012 +0530
+
+    Issue #[1566536] by [manu4543]: Cleaned up javascript and fixed IE issue
+
+[33mcommit b400ff29fc0b658ef53365e30b05c5219a9a0807[m
+Author: Alex Weber <alexweber15@gmail.com>
+Date:   Wed May 9 16:51:12 2012 -0300
+
+    added some comments and hints
+
+[33mcommit 19cb7acb51236d2240f55ea8d661a4db992c90d4[m
+Author: unknown <manu_talkin@yahoo.com>
+Date:   Wed May 9 18:19:46 2012 +0530
+
+    Adding other files
+
+[33mcommit ef91e457e1202c2a8abe37801a7eb8c343f7a2bb[m
+Author: unknown <this@this-PC.(none)>
+Date:   Wed May 9 01:34:31 2012 +0530
+
+    Inital commit.

@@ -203,7 +203,7 @@ function feedback_reloaded_list() {
     ),
   );
 
-  //$filters = feedback_reloaded_get_filter();
+  $filters = feedback_reloaded_get_filter();
 
   $query = new EntityFieldQuery();
   $query
@@ -215,6 +215,10 @@ function feedback_reloaded_list() {
     $query->entityCondition('bundle', $filters['type'], 'IN');
   }
 
+  // If int 0 is set at 0 index then set it to a string other than 0
+  if(gettype($filters['status'][0]) == 'integer' && gettype($filters['status'][1]) == 'string') {
+    $filters['status'][0] = "-1";
+  }
   if (!empty($filters['status'])) {
     $query->propertyCondition('status', $filters['status'], 'IN');
   }
@@ -285,12 +289,12 @@ function feedback_reloaded_list() {
   }
 
   $output = array(
-    //'subs_filter_form' => drupal_get_form('subs_filter_form'),
+    'feedback_reloaded_filter_form' => drupal_get_form('feedback_reloaded_filter_form'),
     'feedback_reloaded_content' => array(
       '#theme' => 'table',
       '#header' => $header,
       '#rows' => $rows,
-      '#empty' => t('There are no subscriptions available.'),
+      '#empty' => t('There are no feedbacks available.'),
     ),
     'pager' => array(
       '#theme' => 'pager',
@@ -298,6 +302,146 @@ function feedback_reloaded_list() {
   );
 
   return $output;
+}
+
+/**
+ * Returns feedback filters.
+ *
+ * @return array
+ *   An array keyed by filter name.
+ *
+ * @see feedback_reloaded_filter_form()
+ */
+function feedback_reloaded_get_filter() {
+  // Pull any saved values from the session.
+  $filters = isset($_SESSION['feedback-reloaded-filter']) ? $_SESSION['feedback-reloaded-filter'] : array();
+
+  // Fill with defaults where necessary.
+  if (!isset($filters['type'])) {
+    $filters['type'] = array_keys(feedback_reloaded_get_types());
+  }
+
+  if (!isset($filters['status'])) {
+    $filters['status'] = array_keys(feedback_reloaded_status_options_list());
+  }
+
+  if (!isset($filters['per_page'])) {
+    $filters['per_page'] = 50;
+  }
+
+  return $filters;
+}
+
+/**
+ * Sets feedback filters.
+ *
+ * @see feedback_reloaded_filter_submit()
+ * @see feedback_reloaded_filter_form()
+ */
+function feedback_reloaded_set_filter($filter) {
+  $_SESSION['feedback-reloaded-filter'] = $filter;
+}
+
+/**
+ * Resets feedback filters.
+ *
+ * @see feedback_reloaded_filter_submit_reset()
+ * @see feedback_reloaded_filter_form()
+ */
+function feedback_reloaded_reset_filter() {
+  unset($_SESSION['feedback-reloaded-filter']);
+}
+
+/**
+ * Form callback.
+ * Displays filter form for listing feedbacks.
+ *
+ * @see feedback_reloaded_list()
+ */
+function feedback_reloaded_filter_form($form, &$form_state) {
+  $filters = feedback_reloaded_get_filter();
+
+  $form['filters'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Filters'),
+    '#prefix' => '<div class="container-inline">',
+    '#suffix' => '</div>',
+    '#tree' => TRUE,
+    '#collapsible' => TRUE,
+    '#collapsed' => !isset($_SESSION['feedback-reloaded-filter']),
+  );
+
+  $type_options = array();
+  foreach (feedback_reloaded_get_types() as $type) {
+    $type_options[$type->name] = $type->getTranslation('label');
+  }
+  asort($type_options);
+
+  $form['filters']['type'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Type'),
+    '#multiple' => TRUE,
+    '#options' => $type_options,
+    '#default_value' => $filters['type'],
+  );
+
+  $form['filters']['status'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Status'),
+    '#multiple' => TRUE,
+    '#options' => feedback_reloaded_status_options_list(),
+    '#default_value' => $filters['status'],
+  );
+
+  $form['filters']['per_page'] = array(
+    '#type' => 'select',
+    '#title' => t('Items Per Page'),
+    '#multiple' => FALSE,
+    '#options' => array(20 => '20', 50 => '50', 100 => '100', 200 => '200', 500 => '500'),
+    '#default_value' => $filters['per_page'],
+  );
+
+  $form['filters']['filter'] = array(
+    '#type' => 'submit',
+    '#value' => t('Filter'),
+    '#submit' => array('feedback_reloaded_filter_submit'),
+  );
+  $form['filters']['reset'] = array(
+    '#type' => 'submit',
+    '#value' => t('Reset'),
+    '#submit' => array('feedback_reloaded_filter_submit_reset'),
+  );
+
+  return $form;
+}
+
+/**
+ * Submit callback.
+ * Applies filters.
+ *
+ * @see feedback_reloaded_filter_form()
+ */
+function feedback_reloaded_filter_submit($form, &$form_state) {
+  $filters = array(
+    'type' => $form_state['values']['filters']['type'],
+    'status' => $form_state['values']['filters']['status'],
+    'per_page' => $form_state['values']['filters']['per_page'],
+  );
+ var_dump($filters['status']);
+
+  feedback_reloaded_set_filter($filters);
+  drupal_goto('admin/reports/feedback');
+}
+
+/**
+ * Submit callback.
+ * Resets filters.
+ *
+ * @see feedback_reloaded_filter_form()
+ */
+function feedback_reloaded_filter_submit_reset($form, &$form_state) {
+  feedback_reloaded_reset_filter();
+  drupal_goto('admin/reports/feedback');
 }
 
 function feedback_reloaded_types($type_name = NULL) {
@@ -621,6 +765,25 @@ function feedback_reloaded_changestatus_form_submit($form, &$form_state) {
   // Success message.
   drupal_set_message(t('Feedback %title saved.', array('%title' => entity_label('feedback_reloaded', $feedback))));
 }
+
+########################
+### Helper Functions ###
+########################
+
+/**
+ * Return the options lists for the feedback status property.
+ *
+ * @return array
+ *   A keyed array with feedback statuses as keys and labels
+ *   as values.
+ */
+function feedback_reloaded_status_options_list() {
+  return array(
+    '0' => t('New'),
+    '1' => t('Processed'),
+  );
+}
+
 ############################
 ### API Functions - CRUD ###
 ############################

@@ -100,3 +100,18 @@
   left:0px;
   border: 0px solid black;
 }
+
+/* Styles for feedback report page */
+
+#feedback-reloaded-filter-form div.form-checkboxes div.form-type-checkbox {
+  display: block;
+}
+
+#feedback-reloaded-filter-form div.form-type-checkboxes {
+  float: left;
+  margin-right: 20px;
+}
+
+#feedback-reloaded-filter-form input.form-submit {
+  margin-left: 20px;
+}
