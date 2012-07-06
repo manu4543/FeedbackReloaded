@@ -457,13 +457,13 @@ var feedbackReloaded = {};
   feedbackReloaded.startFeedback = function() {
     $('body').bind('onselectstart', function() {return false;} );
     $('#glass').remove();
-    $('<canvas id="feedback_canvas" width=1366 height=677 class="feedback_canvas" onMouseUp="feedbackReloaded.getMouse(this,event);" onMouseDown="feedbackReloaded.getMouse(this,event);" onMouseMove="feedbackReloaded.getMouse(this,event);" ondblclick="return false;" > Your browser does not support canvas element</canvas>')
+    $('<canvas id="feedback_canvas" width=13667 height=6777 class="feedback_canvas" onMouseUp="feedbackReloaded.getMouse(this,event);" onMouseDown="feedbackReloaded.getMouse(this,event);" onMouseMove="feedbackReloaded.getMouse(this,event);" ondblclick="return false;" > Your browser does not support canvas element</canvas>')
       .prependTo($('body'));
     var feedbackCanvas =  document.getElementById("feedback_canvas"),
     context = feedbackCanvas.getContext('2d');
     context.globalAlpha = 0.3;
     context.fillStyle = 'black';
-    context.fillRect(0,0,1366,677);
+    context.fillRect(0,0,13667,6777);
   };
 
   //Callback function called by applet when screenshot is ready
