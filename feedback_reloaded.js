@@ -42,7 +42,7 @@ var feedbackReloaded = {};
     }
 
     if ( feedbackReloaded.currentAction == "addnote" ) {
-      if (ev.type == 'mouseup' && obj == document.getElementById("feedback_canvas")) {
+      if (ev.type == 'mouseup' && obj != document.getElementById("feedback_form_container") ) {
         id = feedbackReloaded.notes;
         feedbackReloaded.initx = feedbackReloaded.posx,
         feedbackReloaded.inity = feedbackReloaded.posy;
@@ -380,7 +380,7 @@ var feedbackReloaded = {};
   };
 
   feedbackReloaded.startPhaseTwo = function() {
-    $('<applet code="Screenshot.class" archive="sScreenshot.jar" codebase="'+Drupal.settings.basePath+Drupal.settings.moduleBasePath+'/jar" name="myApplet"  width="1" height ="1" style="position:fixed; left:0px; top:0px;"><PARAM name="modulePath" value="'+Drupal.settings.moduleBasePath+'"></applet>')
+    $('<applet code="Screenshot.class" archive="sScreenshot.jar" codebase="'+Drupal.settings.basePath+Drupal.settings.moduleBasePath+'/jar" name="myApplet"  width="0" height ="0" style="position:fixed; left:0px; top:0px;"><PARAM name="modulePath" value="'+Drupal.settings.moduleBasePath+'"></applet>')
       .appendTo($('body'));
     $('#feedback_wizard_form_div').css('display','none');
     $('#wizard_content', $('#feedback_form_container')).html(Drupal.settings.wizardPhaseTwoContent);
@@ -398,6 +398,19 @@ var feedbackReloaded = {};
       .bind('click', function() {
         if( feedbackReloaded.currentAction !== "highlight") {
           feedbackReloaded.currentAction = "highlight";
+          // Increasing the z-index so that canvas < highligh < blackout
+          var i = 0;
+          $('div[id*="highlight_"]').each(function(index) {
+            $(this).css('z-index', '10000'+i+'');
+            i++;
+            }
+          );
+          i = 0;
+          $('div[id*="blackout"]').each(function(index) {
+            $(this).css('z-index', '1000000000'+i+'');
+            i++;
+            }
+          );
           $(this).attr('disabled','disabled');
           $('#button_blackout').removeAttr("disabled");
           $('#button_addnote').removeAttr("disabled");
@@ -416,6 +429,8 @@ var feedbackReloaded = {};
       .bind('click', function() {
         if( feedbackReloaded.currentAction !== "addnote") {
           feedbackReloaded.currentAction = "addnote";
+          $('div[id*="blackout_"]').css('z-index','99998');
+          $('div[id*="highlight_"]').css('z-index','99997');
           $(this).attr('disabled','disabled');
           $('#button_blackout').removeAttr("disabled");
           $('#button_highlight').removeAttr("disabled");
