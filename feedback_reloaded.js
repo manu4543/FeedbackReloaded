@@ -362,7 +362,7 @@ var feedbackReloaded = {};
   };
 
   feedbackReloaded.startWizard = function() {
-    //$('body').css('overflow','hidden');
+    $('body').css('overflow','hidden');
     $('<div id="glass" class="glass"></div>')
       .appendTo($('body'));
     feedbackReloaded.startPhaseOne();
