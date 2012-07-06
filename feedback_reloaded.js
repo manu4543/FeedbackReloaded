@@ -4,6 +4,8 @@ var feedbackReloaded = {};
 
   "use strict";
 
+  // @manu this should be re-written to use a "Drupal behavior" instead,
+  //        see http://drupal.org/node/756722
   $(document).ready(function () {
     $('<div id="feedback_button" class="feedback_button">Feedback</div>')
       .click(feedbackReloaded.startWizard)
