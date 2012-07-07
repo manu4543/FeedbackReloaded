@@ -309,8 +309,8 @@ var feedbackReloaded = {};
     //Drawing a dimmer on whole page
     context.globalAlpha = 0.3;
     context.fillStyle   = 'black';
-    context.clearRect(0,0,1366,677);
-    context.fillRect(0,0,1366,677);
+    context.clearRect(0,0,13667,6777);
+    context.fillRect(0,0,13667,6777);
     context.globalAlpha = 1;
     context.strokeStyle = 'black';
     context.lineWidth   = 1;
@@ -346,8 +346,8 @@ var feedbackReloaded = {};
     context = feedbackCanvas.getContext('2d');
     context.globalAlpha = 0.3;
     context.fillStyle = 'black';
-    context.clearRect(0,0,1366,677);
-    context.fillRect(0,0,1366,677);
+    context.clearRect(0,0,13667,6777);
+    context.fillRect(0,0,13667,6777);
     context.globalAlpha = 1
     context.strokeStyle = 'black'
     context.lineWidth   = 1;
