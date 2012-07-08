@@ -309,8 +309,8 @@ var feedbackReloaded = {};
     //Drawing a dimmer on whole page
     context.globalAlpha = 0.3;
     context.fillStyle   = 'black';
-    context.clearRect(0,0,2000,1000);
-    context.fillRect(0,0,2000,1000);
+    context.clearRect(0,0,$(window).width(),$(window).height());
+    context.fillRect(0,0,$(window).width(),$(window).height());
     context.globalAlpha = 1;
     context.strokeStyle = 'black';
     context.lineWidth   = 1;
@@ -342,12 +342,15 @@ var feedbackReloaded = {};
   };
 
   feedbackReloaded.reRender = function() {
+    // Set width and height according to the current window dimensions
+    $('#feedback_canvas').attr('width',$(window).width());
+    $('#feedback_canvas').attr('height',$(window).height());
     var feedbackCanvas = document.getElementById("feedback_canvas"),
     context = feedbackCanvas.getContext('2d');
     context.globalAlpha = 0.3;
     context.fillStyle = 'black';
-    context.clearRect(0,0,2000,1000);
-    context.fillRect(0,0,2000,1000);
+    context.clearRect(0,0,$(window).width(),$(window).height());
+    context.fillRect(0,0,$(window).width(),$(window).height());
     context.globalAlpha = 1
     context.strokeStyle = 'black'
     context.lineWidth   = 1;
@@ -457,13 +460,17 @@ var feedbackReloaded = {};
   feedbackReloaded.startFeedback = function() {
     $('body').bind('onselectstart', function() {return false;} );
     $('#glass').remove();
-    $('<canvas id="feedback_canvas" width=2000 height=1000 class="feedback_canvas" onMouseUp="feedbackReloaded.getMouse(this,event);" onMouseDown="feedbackReloaded.getMouse(this,event);" onMouseMove="feedbackReloaded.getMouse(this,event);" ondblclick="return false;" > Your browser does not support canvas element</canvas>')
+    $('<canvas id="feedback_canvas" width='+$(window).width()+' height='+$(window).height()+' class="feedback_canvas" onMouseUp="feedbackReloaded.getMouse(this,event);" onMouseDown="feedbackReloaded.getMouse(this,event);" onMouseMove="feedbackReloaded.getMouse(this,event);" ondblclick="return false;" > Your browser does not support canvas element</canvas>')
       .prependTo($('body'));
+    // Set resize handler so that canvas redraws on resizing.
+    $(window).bind('resize', function () {
+      feedbackReloaded.reRender();
+    });
     var feedbackCanvas =  document.getElementById("feedback_canvas"),
     context = feedbackCanvas.getContext('2d');
     context.globalAlpha = 0.3;
     context.fillStyle = 'black';
-    context.fillRect(0,0,2000,1000);
+    context.fillRect(0,0,$(window).width(),$(window).height());
   };
 
   //Callback function called by applet when screenshot is ready
@@ -515,6 +522,8 @@ var feedbackReloaded = {};
     if($('#glass')) {
       $('#glass').remove();
     }
+    // Remove resize event handler attached during startFeedback.
+    $(window).unbind('resize');
     Drupal.detachBehaviors('#feedback_form_container');
     $('#feedback_form_container').remove();
     $('applet[name="myApplet"]').remove();
