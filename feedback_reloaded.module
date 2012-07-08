@@ -266,15 +266,15 @@ function feedback_reloaded_list() {
       'query' => $destination,
     );
 
-    $operations['delete'] = array(
-      'title' => t('delete'),
-      'href' => 'feedback/' . $feedback->fid . '/delete',
-      'query' => $destination,
-    );
-
     $operations['edit'] = array(
       'title' => t('edit'),
       'href' => 'feedback/' . $feedback->fid . '/edit',
+      'query' => $destination,
+    );
+
+    $operations['delete'] = array(
+      'title' => t('delete'),
+      'href' => 'feedback/' . $feedback->fid . '/delete',
       'query' => $destination,
     );
 
