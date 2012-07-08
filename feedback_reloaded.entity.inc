@@ -47,7 +47,10 @@ class FeedbackR extends Entity {
   protected function defaultLabel() {
     $username = isset($this->uid) ? user_load($this->uid)->name : 'username';
     $type_label = feedback_reloaded_get_types($this->type)->getTranslation('label');
-    return t('@type type Feedback by @username', array('@type' => $type_label, '@username' => $username));
+    if(!empty($this->title))
+      return t('@title', array('@title' => $this->title));
+    else
+      return t('@type Feedback by @username', array('@type' => $type_label, '@username' => $username));
   }
 
   protected function defaultUri() {

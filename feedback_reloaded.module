@@ -601,10 +601,14 @@ function feedback_reloaded_form($form, &$form_state, $feedback) {
 
   $form['screenshot'] = array('#type' => 'hidden');
 
+  $form['title'] = array(
+    '#title' => 'Title',
+    '#type' => 'textfield',
+  );
+
   $form['message'] = array(
     '#title' => 'Description',
     '#type' => 'textarea',
-    '#required' => TRUE,
     '#description' => t('Please give us the brief desciption reagarding your feedback'),
   );
 
@@ -721,10 +725,16 @@ function feedback_reloaded_delete_form_submit($form, &$form_state) {
 function feedback_reloaded_edit_form($form, &$form_state, $feedback) {
   $feedback_type = feedback_reloaded_type_types($feedback->type);
   $form_state['feedback'] = $feedback;
+
+  $form['title'] = array(
+    '#title' => 'Title',
+    '#type' => 'textfield',
+    '#default_value' => $feedback->title,
+  );
+
   $form['message'] = array(
     '#title' => 'Description',
     '#type' => 'textarea',
-    '#required' => TRUE,
     '#description' => t('Please give us the brief desciption reagarding your feedback'),
     '#default_value' => $feedback->message,
   );

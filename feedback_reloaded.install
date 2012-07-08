@@ -55,11 +55,15 @@ function feedback_reloaded_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'title' => array(
+        'description' => 'The feedback title.',
+        'type' => 'text',
+        'size' => 'big',
+      ),
       'message' => array(
         'description' => 'The feedback message.',
         'type' => 'text',
         'size' => 'big',
-        'not null' => TRUE,
       ),
       'url' => array(
         'description' => 'Absolute URL of the originating page.',
