@@ -133,10 +133,10 @@ function feedback_reloaded_menu() {
   );
 
   //Change review status of feedback.
-  $items[$feedback_uri . '/changestatus'] = array(
+  $items[$feedback_uri . '/edit'] = array(
     'title' => 'Edit',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('feedback_reloaded_changestatus_form', $feedback_uri_argument_position),
+    'page arguments' => array('feedback_reloaded_edit_form', $feedback_uri_argument_position),
     'access callback' => 'entity_access',
     'access arguments' => array('edit', 'feedback_reloaded', $feedback_uri_argument_position),
     'type' => MENU_LOCAL_TASK,
@@ -209,7 +209,7 @@ function feedback_reloaded_list() {
   $query
     ->entityCondition('entity_type', 'feedback_reloaded')
     ->tableSort($header)
-    ->pager('20');
+    ->pager($filters['per_page']);
 
   if (!empty($filters['type'])) {
     $query->entityCondition('bundle', $filters['type'], 'IN');
@@ -272,9 +272,9 @@ function feedback_reloaded_list() {
       'query' => $destination,
     );
 
-    $operations['changestatus'] = array(
-      'title' => t('change status'),
-      'href' => 'feedback/' . $feedback->fid . '/changestatus',
+    $operations['edit'] = array(
+      'title' => t('edit'),
+      'href' => 'feedback/' . $feedback->fid . '/edit',
       'query' => $destination,
     );
 
@@ -718,7 +718,7 @@ function feedback_reloaded_delete_form_submit($form, &$form_state) {
   drupal_set_message(t('Feedback %title deleted.', array('%title' => entity_label('feedback_reloaded', $feedback))));
 }
 
-function feedback_reloaded_changestatus_form($form, &$form_state, $feedback) {
+function feedback_reloaded_edit_form($form, &$form_state, $feedback) {
   $feedback_type = feedback_reloaded_type_types($feedback->type);
   $form_state['feedback'] = $feedback;
   $form['message'] = array(
@@ -747,13 +747,13 @@ function feedback_reloaded_changestatus_form($form, &$form_state, $feedback) {
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save feedback'),
-    '#submit' => array('feedback_reloaded_changestatus_form_submit'),
+    '#submit' => array('feedback_reloaded_edit_form_submit'),
   );
 
   return $form;
 }
 
-function feedback_reloaded_changestatus_form_submit($form, &$form_state) {
+function feedback_reloaded_edit_form_submit($form, &$form_state) {
   $feedback = $form_state['feedback'];
 
   // Build entity.
