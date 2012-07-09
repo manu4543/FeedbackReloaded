@@ -72,7 +72,7 @@ function feedback_reloaded_entity_info() {
     'bundle keys' => array(
       'bundle' => 'name',
     ),
-				'bundles' => array(),
+    'bundles' => array(),
     'uri callback' => 'entity_class_uri',
     'label callback' => 'entity_class_label',
     'access callback' => 'feedback_reloaded_access',
@@ -81,6 +81,21 @@ function feedback_reloaded_entity_info() {
   );
 
   return $return;
+}
+
+/**
+ * Define default feedback configurations.
+ *
+ * @return
+ *   An array of default entities, keyed by machine names.
+ */
+function feedback_reloaded_default_feedback_reloaded_type() {
+  $defaults['standard'] = entity_create('feedback_reloaded_type', array(
+    'label' => 'Standard',
+    'description' => 'This is default standard feedback type.',
+  ));
+
+  return $defaults;
 }
 
 /**
