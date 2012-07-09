@@ -23,6 +23,8 @@ var feedbackReloaded = {};
   feedbackReloaded.notes       = 0;
   feedbackReloaded.canvasIndex   = 99999;
   feedbackReloaded.screenshotBase64 = "empty";
+  feedbackReloaded.currentWindowWidth = $(window).width();
+  feedbackReloaded.currentWindowHeight = $(window).height();
   feedbackReloaded.rect = function(left, top, width, height) {
     this.active = 1;
     this.left   = left;
@@ -309,8 +311,8 @@ var feedbackReloaded = {};
     //Drawing a dimmer on whole page
     context.globalAlpha = 0.3;
     context.fillStyle   = 'black';
-    context.clearRect(0,0,$(window).width(),$(window).height());
-    context.fillRect(0,0,$(window).width(),$(window).height());
+    context.clearRect(0,0,feedbackReloaded.currentWindowWidth,feedbackReloaded.currentWindowHeight);
+    context.fillRect(0,0,feedbackReloaded.currentWindowWidth,feedbackReloaded.currentWindowHeight);
     context.globalAlpha = 1;
     context.strokeStyle = 'black';
     context.lineWidth   = 1;
@@ -343,14 +345,14 @@ var feedbackReloaded = {};
 
   feedbackReloaded.reRender = function() {
     // Set width and height according to the current window dimensions
-    $('#feedback_canvas').attr('width',$(window).width());
-    $('#feedback_canvas').attr('height',$(window).height());
+    $('#feedback_canvas').attr('width',feedbackReloaded.currentWindowWidth);
+    $('#feedback_canvas').attr('height',feedbackReloaded.currentWindowHeight);
     var feedbackCanvas = document.getElementById("feedback_canvas"),
     context = feedbackCanvas.getContext('2d');
     context.globalAlpha = 0.3;
     context.fillStyle = 'black';
-    context.clearRect(0,0,$(window).width(),$(window).height());
-    context.fillRect(0,0,$(window).width(),$(window).height());
+    context.clearRect(0,0,feedbackReloaded.currentWindowWidth,feedbackReloaded.currentWindowHeight);
+    context.fillRect(0,0,feedbackReloaded.currentWindowWidth,feedbackReloaded.currentWindowHeight);
     context.globalAlpha = 1
     context.strokeStyle = 'black'
     context.lineWidth   = 1;
@@ -452,9 +454,9 @@ var feedbackReloaded = {};
       .removeAttr("onMouseDown")
       .removeAttr("onMouseUp");
 
-    var currentHeight = $(window).height();
-    var currentWidth = $(window).width();
-    document.myApplet.doit(currentWidth, currentHeight);
+    feedbackReloaded.currentWindowHeight = $(window).height();
+    feedbackReloaded.currentWindowWidth = $(window).width();
+    document.myApplet.doit(feedbackReloaded.currentWindowWidth, feedbackReloaded.currentWindowHeight);
   };
 
   feedbackReloaded.startFeedback = function() {
@@ -464,13 +466,15 @@ var feedbackReloaded = {};
       .prependTo($('body'));
     // Set resize handler so that canvas redraws on resizing.
     $(window).bind('resize', function () {
+      feedbackReloaded.currentWindowWidth = $(window).width();
+      feedbackReloaded.currentWindowHeight = $(window).height();
       feedbackReloaded.reRender();
     });
     var feedbackCanvas =  document.getElementById("feedback_canvas"),
     context = feedbackCanvas.getContext('2d');
     context.globalAlpha = 0.3;
     context.fillStyle = 'black';
-    context.fillRect(0,0,$(window).width(),$(window).height());
+    context.fillRect(0,0,feedbackReloaded.currentWindowWidth,feedbackReloaded.currentWindowWidth);
   };
 
   //Callback function called by applet when screenshot is ready
