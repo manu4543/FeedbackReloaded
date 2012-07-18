@@ -4,14 +4,6 @@ var feedbackReloaded = {};
 
   "use strict";
 
-  // @manu this should be re-written to use a "Drupal behavior" instead,
-  //        see http://drupal.org/node/756722
-  $(document).ready(function () {
-    $('<div id="feedback_button" class="feedback_button">Feedback</div>')
-      .click(feedbackReloaded.startWizard)
-      .appendTo($('body'));
-  });
-
   //feedbackReloaded Variables and fuctions declaration
   feedbackReloaded.currentAction = "highlight";
   feedbackReloaded.initx       = false,
@@ -548,4 +540,17 @@ var feedbackReloaded = {};
         .attr('src','data:image/png;base64,'+feedbackReloaded.screenshotBase64+'');
     }
   };
+
+  //Add Feedback Button to page.
+  Drupal.behaviors.addFeedbackButton = {
+    attach: function (context, settings) {
+      //Checking if script is running inside a iframe if yes then do not add button see http://drupal.org/node/1683086
+      if(top == self) {
+        $('<div id="feedback_button" class="feedback_button">Feedback</div>')
+          .click(feedbackReloaded.startWizard)
+          .prependTo($('body'));
+      }
+    }
+  };
+
 }(jQuery));
