@@ -120,6 +120,16 @@ function feedback_reloaded_entity_info_alter(&$entity_info) {
 function feedback_reloaded_menu() {
   $items = array();
 
+  // Settings page.
+  $items['admin/config/workflow/feedback'] = array(
+    'title' => 'Feedback',
+    'description' => 'Manage feedback settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('feedback_reloaded_settings_form'),
+    'access arguments' => array('administer feedback'),
+    'file' => 'feedback_reloaded.admin.inc',
+  );
+
   $items['admin/reports/feedback'] = array(
     'title' => 'Feedbacks',
     'description' => t('View feedbacks submitted by users.'),
@@ -168,12 +178,25 @@ function feedback_reloaded_menu() {
   );
 
   return $items;
+}
 
+/**
+ * Implements hook_file_download().
+ */
+function feedback_reloaded_file_download($uri) {
+   if (!user_access('view feedback messages')) {
+      // Access to the file is denied.
+      return -1;
+    }
+    else {
+      $info = image_get_info($uri);
+      return array('Content-Type' => $info['mime_type']);
+    }
 }
 
 /**
  * Page callback.
- * Lists all subscriptions.
+ * Lists all feedbacks.
  *
  */
 function feedback_reloaded_list() {
@@ -650,6 +673,7 @@ function feedback_reloaded_form($form, &$form_state, $feedback) {
  */
 function feedback_reloaded_form_callback(&$form, &$form_state) {
   // If there was a form validation error, re-render the entire form.
+
   global $user;
   $error = form_get_errors();
   if($error) {
@@ -677,9 +701,8 @@ function feedback_reloaded_form_callback(&$form, &$form_state) {
 
   //Save screenshot
   $data = $screenshot;
-  $uri = "public://screenshot.png";
-
-  // Managed operations work with a file object.
+  $uri = variable_get('feedback_reloaded_screenshot_uri', 'public://feedback_reloaded_screenshots');
+  $uri .= '/screenshot'.mt_rand().'.png';
   $file_object = file_save_data($data, $uri, FILE_EXISTS_RENAME);
   if (!empty($file_object)) {
     $url = file_create_url($file_object->uri);
@@ -748,7 +771,7 @@ function feedback_reloaded_edit_form($form, &$form_state, $feedback) {
   $form['message'] = array(
     '#title' => 'Description',
     '#type' => 'textarea',
-    '#description' => t('Please give us the brief desciption reagarding your feedback'),
+    '#description' => t('Please give us the brief desciption regarding your feedback'),
     '#default_value' => $feedback->message,
   );
 
