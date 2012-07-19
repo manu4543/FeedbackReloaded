@@ -716,8 +716,8 @@ function feedback_reloaded_form_callback(&$form, &$form_state) {
   // Save entity.
   feedback_reloaded_save($feedback);
   $status = "<p style=\"margin-bottom:9px; margin-top:50px;\">";
-  $status .= "Feedback Submitted Succesfully. Thanks for your feedback.<br><br><button onclick = \"feedbackReloaded.stopFeedback();\" value = \"Finish\">Finish</button>";
-  $status .= "</p>";
+  $status .= variable_get('feedback_reloaded_after_save_text','Feedback Submitted Succesfully. Thanks for your feedback.');
+  $status .= "<br><br><button onclick = \"feedbackReloaded.stopFeedback();\" value = \"Finish\">Finish</button></p>";
   $commands = array();
   $commands[] = ajax_command_remove('#feedback_wizard_form_div');
   $commands[] = ajax_command_html('#wizard_content', $status);
