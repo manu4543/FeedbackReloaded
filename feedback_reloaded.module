@@ -701,9 +701,23 @@ function feedback_reloaded_form_callback(&$form, &$form_state) {
 
   //Save screenshot
   $data = $screenshot;
-  $uri = variable_get('feedback_reloaded_screenshot_uri', 'public://feedback_reloaded_screenshots');
-  $uri .= '/screenshot'.mt_rand().'.png';
-  $file_object = file_save_data($data, $uri, FILE_EXISTS_RENAME);
+  $feedback_reloaded_screenshot_uri = variable_get('feedback_reloaded_screenshot_uri');
+  $privateFilePath = variable_get('file_private_path');
+  // If feedback_reloaded_screenshot_uri is set to private then make sure directory exist as this was not created when module was installed
+  if($feedback_reloaded_screenshot_uri == 'private://feedback_reloaded_screenshots' && $privateFilePath) {
+    if(!file_prepare_directory($feedback_reloaded_screenshot_uri, FILE_CREATE_DIRECTORY)) {
+      variable_set('feedback_reloaded_error','Directory could not be created in private://');
+    }
+  }
+  // If private storage is removed at some point later then fallback to public://
+  elseif(!$privateFilePath) {
+    $feedback_reloaded_screenshot_uri = 'public://feedback_reloaded_screenshots';
+    variable_set('feedback_reloaded_screenshot_uri',$feedback_reloaded_screenshot_uri);
+  }
+
+
+  $feedback_reloaded_screenshot_uri .= '/screenshot'.mt_rand().'.png';
+  $file_object = file_save_data($data, $feedback_reloaded_screenshot_uri, FILE_EXISTS_RENAME);
   if (!empty($file_object)) {
     $url = file_create_url($file_object->uri);
     $feedback->screenshoturl = $url;

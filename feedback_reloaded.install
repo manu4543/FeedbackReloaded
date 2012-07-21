@@ -1,5 +1,6 @@
 <?php
 /**
+
  * @file
  * Installation functions for Feedback module.
  */
@@ -17,6 +18,7 @@ function feedback_reloaded_uninstall() {
     variable_del($row->name);
   }
   variable_del('feedback_reloaded_screenshot_uri');
+  variable_del('feedback_reloaded_after_save_text');
 }
 
 /**
@@ -160,11 +162,16 @@ function feedback_reloaded_schema() {
 
 /**
  * Implements hook_requirements().
+ * Manage directory where screenshots will be saved.
+ *
+ * When this hook is executed first time then feedback_reloaded_screenshots sub-directory is created both in private:// and pubic://.
+ * During runtime variable feedback_reloaded_screenshot_uri is checked and set according to current setting in Drupal installation.
  */
 function feedback_reloaded_requirements($phase) {
   $requirements = array();
   $feedback_reloaded_screenshot_uri = variable_get('feedback_reloaded_screenshot_uri');
   $privateFilePath = variable_get('file_private_path');
+  $error = variable_get('feedback_reloaded_error');
   if ($phase == 'runtime') {
     $requirements['filestorage'] = array(
       'title' => t('Feedback screenshot storage'),
@@ -173,44 +180,45 @@ function feedback_reloaded_requirements($phase) {
       'description' => t('All requirements are met successfully.'),
     );
 
-    // Create sub-directory 'feedback_reloaded_screenshots', where screenshots will be saved
-    // Executes only first time when variable feedback_reloaded_screenshot_uri is not set.
-
-    // If Private file path is set
-    if($privateFilePath && empty($feedback_reloaded_screenshot_uri)) {
-      $path = variable_get('file_private_path').'://feedback_reloaded_screenshots';
-      variable_set('feedback_reloaded_screenshot_uri', $path);
-      $feedback_reloaded_screenshot_uri = variable_get('feedback_reloaded_screenshot_uri');
-      if(!file_prepare_directory($path, FILE_CREATE_DIRECTORY)) {
-        $requirements['filestorage']['description'] = t('The feedback_reloaded_screenshots directory, could not be created due to a misconfigured files or directory. Please ensure that the files or directory is correctly configured and that the webserver has permission to create directories.');
-        $requirements['filestorage']['severity'] = REQUIREMENT_ERROR;
-        $requirements['filestorage']['value'] = t('Unable to create');
-      }
-    }
-
-    // If Private file path is not set
-    if(empty($privateFilePath) && empty($feedback_reloaded_screenshot_uri)) {
-      $path = 'public://feedback_reloaded_screenshots';
-      variable_set('feedback_reloaded_screenshot_uri', $path);
-      $feedback_reloaded_screenshot_uri = variable_get('feedback_reloaded_screenshot_uri');
-      if(!file_prepare_directory($path, FILE_CREATE_DIRECTORY)) {
-        $requirements['filestorage']['description'] = t('Thee feedback_reloaded_screenshots directory, could not be created due to a misconfigured files directory. Please ensure that the files directory is correctly configured and that the webserver has permission to create directories.');
-        $requirements['filestorage']['severity'] = REQUIREMENT_ERROR;
-        $requirements['filestorage']['value'] = t('Unable to create');
-      }
-    }
-
     // If private storage is removed at some point later then degrade gracefully to public storage
-    if($feedback_reloaded_screenshot_uri == 'public://feedback_reloaded_screenshots' || (empty($privateFilePath) && $feedback_reloaded_screenshot_uri == 'private://feedback_reloaded_screenshots')) {
-      $path = 'public://feedback_reloaded_screenshots';
-      variable_set('feedback_reloaded_screenshot_uri', $path);
+    if(isset($error) || $feedback_reloaded_screenshot_uri == 'public://feedback_reloaded_screenshots' || (empty($privateFilePath) && $feedback_reloaded_screenshot_uri == 'private://feedback_reloaded_screenshots')) {
+      if(isset($error)) {
+        $requirements['filestorage']['description'] = t('Directory could not created due to misconfigured files/directory. After configuration re-install module to solve problem.');
+        $requirements['filestorage']['severity'] = REQUIREMENT_ERROR;
+        return $requirements;
+      }
       $requirements['filestorage']['description'] = t('Screenshots may contain sensitive information and it is recommended to save them in private stroage.');
       $requirements['filestorage']['severity'] = REQUIREMENT_WARNING;
       if(!$privateFilePath)
-        $requirements['filestorage']['value'] = t('Private storage not available');
+        $requirements['filestorage']['value'] = t('Private storage is not available in your Drupal installation.');
       else
-        $requirements['filestorage']['value'] = t('Screenshot Destination is not private.');
+        $requirements['filestorage']['value'] = t('Screenshot are being saved in public directory.');
     }
   }
   return $requirements;
+}
+
+/**
+  * Implement hook_enable()
+  */
+function feedback_reloaded_enable() {
+  $privateFilePath = variable_get('file_private_path');
+  if($privateFilePath) {
+    $path = 'private://feedback_reloaded_screenshots';
+    if(!file_prepare_directory($path, FILE_CREATE_DIRECTORY)) {
+      variable_set('feedback_reloaded_error','Directory could not be created in private://');
+    }
+    variable_set('feedback_reloaded_screenshot_uri', $path);
+  }
+
+  // Always Create feedback_reloaded_screenshots subdirectory in public://
+  $path = 'public://feedback_reloaded_screenshots';
+  if(!file_prepare_directory($path, FILE_CREATE_DIRECTORY)) {
+    variable_set('feedback_reloaded_error','Directory could not be created in public://');
+  }
+
+  // If private storage is not available then fallback to public://
+  if(empty($privateFilePath)) {
+    variable_set('feedback_reloaded_screenshot_uri', $path);
+  }
 }
