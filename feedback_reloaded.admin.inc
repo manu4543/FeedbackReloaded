@@ -70,6 +70,8 @@ function feedback_reloaded_type_form($form, &$form_state, $feedback_reloaded_typ
   $form['name'] = array(
     '#type' => 'machine_name',
     '#default_value' => isset($feedback_reloaded_type->type) ? $feedback_reloaded_type->type : '',
+    '#maxlength' => 32,
+    '#disabled' => $feedback_reloaded_type->isLocked() && $op != 'clone',
     '#machine_name' => array(
       'exists' => 'feedback_reloaded_get_types',
       'source' => array('label'),

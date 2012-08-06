@@ -70,4 +70,14 @@ class FeedbackRType extends Entity {
     parent::__construct($values, 'feedback_reloaded_type');
   }
 
+  /**
+   * Returns whether the feedback type is locked and thus may not be deleted or renamed.
+   *
+   * Feedbacl types provided in code are automatically treated as locked, as well
+   * as any fixed subscription type.
+   */
+  public function isLocked() {
+    return isset($this->status) && empty($this->is_new) && (($this->status & ENTITY_IN_CODE) || ($this->status & ENTITY_FIXED));
+  }
+
 }
