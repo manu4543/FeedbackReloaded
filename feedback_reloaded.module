@@ -270,6 +270,7 @@ function feedback_reloaded_list() {
   }
 
   $destination = drupal_get_destination();
+  // @manu if this isn't being used get rid of it!
   $feedback_types = feedback_reloaded_get_types();
   $status_options = array(
     '0' => t('New'),
@@ -623,6 +624,9 @@ function feedback_reloaded_form($form, &$form_state, $feedback) {
   $form['#prefix'] = '<div id="feedback-wizard-form-wrapper">';
   $form['#suffix'] = '</div>';
   $form_state['feedback'] = $feedback;
+  // @manu none of the following 3 variables are being used, either use them
+  // or get rid of them!
+  // PS - are you checking access before displaying the form?
   $feedback_type = feedback_reloaded_get_types($feedback->type);
   $aid = entity_id('feedback_reloaded', $feedback);
   $administer_feedback_reloaded = user_access('administer feedback');
