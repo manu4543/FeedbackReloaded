@@ -1,7 +1,6 @@
 <?php
-
 /**
-  * Implement hook_default_rules_configuration()
+  * Implements hook_default_rules_configuration().
   */
 function feedback_reloaded_default_rules_configuration() {
   $rules['rules_send_feedback_notification'] = entity_import('rules_config', '{ "rules_send_feedback_notification" : {
