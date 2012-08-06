@@ -1079,5 +1079,9 @@ function feedback_reloaded_get_types($type_name = NULL) {
           : FALSE);
   }
 
-  return isset($type_name) ? reset($feedback_reloaded_types) : $feedback_reloaded_types;
+  if (isset($type_name)) {
+    return isset($feedback_reloaded_types[$type_name]) ? $feedback_reloaded_types[$type_name] : FALSE;
+  } else {
+    return $feedback_reloaded_types;
+  }
 }
