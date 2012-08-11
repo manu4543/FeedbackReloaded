@@ -9,10 +9,11 @@
 function feedback_reloaded_settings_form() {
   $form = array();
 
-  $option = array('public://feedback_reloaded_screenshots' => t('Public'));
-  if(variable_get('file_private_path')) {
-    $option['private://feedback_reloaded_screenshots'] = t('Private (Recommended)');
-  }
+  $option = array(
+    'public://feedback_reloaded_screenshots' => t('Public'),
+    'private://feedback_reloaded_screenshots' => t('Private (Recommended)')
+  );
+  
 
   $form['feedback_reloaded_screenshot_uri'] = array(
    '#type' => 'radios',
@@ -21,12 +22,16 @@ function feedback_reloaded_settings_form() {
     '#description' => t('Select where you want to save screenshots associated with feedbacks. It is recommended that screenshots should be saved in private storage as they may contain sensitive information.<br>In case private storage is not available in your Drupal installation you need to set private file system path under Configuration > File System.'),
     '#default_value' => variable_get('feedback_reloaded_screenshot_uri'),
   );
-
+  
+  // If the user doesn't have a private filesystem configured then disable the private file system option 
+  if(!variable_get('file_private_path')) {
+     $form['feedback_reloaded_screenshot_uri']['private://feedback_reloaded_screenshots']['#disabled'] = TRUE;
+  }
   $form['feedback_reloaded_after_save_text'] = array(
     '#type' => 'textarea',
     '#title' => t('After feedback save message'),
     '#description' => t('Please specify the message to be show after successfully saving feedback from user.'),
-    '#default_value' => variable_get('feedback_reloaded_after_save_text','Feedback Submitted Succesfully. Thanks for your feedback.'),
+    '#default_value' => variable_get('feedback_reloaded_after_save_text','Feedback Submitted Successfully. Thanks for your feedback.'),
   );
 
   return system_settings_form($form);
