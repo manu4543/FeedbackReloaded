@@ -100,16 +100,12 @@ function feedback_reloaded_type_form($form, &$form_state, $feedback_reloaded_typ
  */
 function feedback_reloaded_type_form_submit(&$form, &$form_state) {
   $feedback_reloaded_type = entity_ui_form_submit_build_entity($form, $form_state);
-  if (feedback_reloaded_type_save($feedback_reloaded_type)) {
-    if ($form_state['op'] === 'edit') {
-      drupal_set_message(t('Feedback type %label saved.', array('%label' => $feedback_reloaded_type->getTranslation('label'))));
-    }
-    elseif ($form_state['op'] === 'add') {
-      drupal_set_message(t('Feedback type %label created.', array('%label' => $feedback_reloaded_type->getTranslation('label'))));
-    }
+  feedback_reloaded_type_save($feedback_reloaded_type);
+  if ($form_state['op'] === 'edit') {
+    drupal_set_message(t('Feedback type %label saved.', array('%label' => $feedback_reloaded_type->getTranslation('label'))));
   }
-  else {
-    drupal_set_message(t('Error saving Feedback type %label.', array('%label' => $feedback_reloaded_type->getTranslation('label'))), 'error');
+  elseif ($form_state['op'] === 'add') {
+    drupal_set_message(t('Feedback type %label created.', array('%label' => $feedback_reloaded_type->getTranslation('label'))));
   }
   $form_state['redirect'] = 'admin/structure/feedbacks';
 }
