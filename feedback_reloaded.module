@@ -270,8 +270,6 @@ function feedback_reloaded_list() {
   }
 
   $destination = drupal_get_destination();
-  // @manu if this isn't being used get rid of it!
-  $feedback_types = feedback_reloaded_get_types();
   $status_options = array(
     '0' => t('New'),
     '1' => t('Processed'),
@@ -624,13 +622,7 @@ function feedback_reloaded_form($form, &$form_state, $feedback) {
   $form['#prefix'] = '<div id="feedback-wizard-form-wrapper">';
   $form['#suffix'] = '</div>';
   $form_state['feedback'] = $feedback;
-  // @manu none of the following 3 variables are being used, either use them
-  // or get rid of them!
-  // PS - are you checking access before displaying the form?
-  $feedback_type = feedback_reloaded_get_types($feedback->type);
-  $aid = entity_id('feedback_reloaded', $feedback);
-  $administer_feedback_reloaded = user_access('administer feedback');
-
+  
   $form['url'] = array('#type' => 'hidden');
 
   field_attach_form('feedback_reloaded', $feedback, $form, $form_state);
@@ -676,9 +668,9 @@ function feedback_reloaded_form($form, &$form_state, $feedback) {
  * @see feedback_reloaded_form()
  */
 function feedback_reloaded_form_callback(&$form, &$form_state) {
-  // If there was a form validation error, re-render the entire form.
-
   global $user;
+
+  // If there was a form validation error, re-render the entire form.
   $error = form_get_errors();
   if($error) {
     return $form;
@@ -689,16 +681,16 @@ function feedback_reloaded_form_callback(&$form, &$form_state) {
   //Now decode this base64 encoded date and store in $screenshot
   $screenshot = base64_decode($screenshot);
   $defaults = array(
-      'uid' => $user->uid,
-      'timestamp' => REQUEST_TIME,
-      'useragent' => $_SERVER['HTTP_USER_AGENT'],
-    );
+    'uid' => $user->uid,
+    'timestamp' => REQUEST_TIME,
+    'useragent' => $_SERVER['HTTP_USER_AGENT'],
+  );
 
   foreach ($defaults as $key => $default) {
-      if (!isset($feedback->$key)) {
-        $feedback->$key = $default;
-      }
+    if (!isset($feedback->$key)) {
+      $feedback->$key = $default;
     }
+  }
 
   // Build entity.
   entity_form_submit_build_entity('feedback_reloaded', $feedback, $form, $form_state);
@@ -1005,6 +997,7 @@ function feedback_reloaded_save(FeedbackR $feedback_reloaded) {
 function feedback_reloaded_type_load($type) {
   return feedback_reloaded_types($type);
 }
+
 /**
 * List of task Types.
 */

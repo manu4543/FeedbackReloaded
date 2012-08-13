@@ -192,7 +192,7 @@ function feedback_reloaded_requirements($phase) {
       if(!$privateFilePath)
         $requirements['filestorage']['value'] = t('Private storage is not available in your Drupal installation.');
       else
-        $requirements['filestorage']['value'] = t('Screenshot are being saved in public directory.');
+        $requirements['filestorage']['value'] = t('Screenshots are being saved in public directory.');
     }
   }
   return $requirements;
