@@ -1,19 +1,37 @@
 .feedback_button {
   position:fixed;
-  right:20px;
-  bottom: 0px;
-  min-width: 80px;
-  background-color: #ccc;
-  min-height: 25px;
-  text-align:center;
-  vertical-align:middle;
-  border: solid 1px #999;
-  border-bottom: 0px;
-  cursor:pointer;
-  font-family: "Arial", sans-serif;
-  border-radius: 3px;
-  margin-bottom: -2px;
+  right:0px;
+  bottom: 40px;
   z-index: 20000;
+  cursor:pointer;
+  font-family: Arial, Helvetica, sans-serif;
+	font-size: 17px;
+	color: #ffffff;
+	padding: 6px 6px;
+	background: -moz-linear-gradient(
+		top,
+		#0091ff 0%,
+		#020b14);
+	background: -webkit-gradient(
+		linear, left top, left bottom, 
+		from(#0091ff),
+		to(#020b14));
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	border: 0px solid #00050a;
+	-moz-box-shadow:
+		-1px 1px 7px rgba(000,000,000,0.3),
+		inset 0px 0px 1px rgba(005,000,005,0.5);
+	-webkit-box-shadow:
+		-1px 1px 7px rgba(000,000,000,0.3),
+		inset 0px 0px 1px rgba(005,000,005,0.5);
+	box-shadow:
+		-1px 1px 7px rgba(000,000,000,0.3),
+		inset 0px 0px 1px rgba(005,000,005,0.5);
+	text-shadow:
+		0px -1px 0px rgba(033,027,033,0.7),
+		0px 1px 0px rgba(255,255,255,0.3);
 }
 
 .highlighted_region {
