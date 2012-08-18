@@ -30,7 +30,7 @@ function feedback_reloaded_settings_form() {
   $form['feedback_reloaded_after_save_text'] = array(
     '#type' => 'textarea',
     '#title' => t('After feedback save message'),
-    '#description' => t('Please specify the message to be show after successfully saving feedback from user.'),
+    '#description' => t('Please specify the message to be shown after successfully saving feedback.'),
     '#default_value' => variable_get('feedback_reloaded_after_save_text','Feedback Submitted Successfully. Thanks for your feedback.'),
   );
 
