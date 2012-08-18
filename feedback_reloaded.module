@@ -21,6 +21,29 @@ function feedback_reloaded_permission() {
 }
 
 /**
+ * Implements hook_help().
+ */
+function feedback_reloaded_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#feedback_reloaded':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The Feedback Reloaded module provides complete feedback solution to site administrators. Feedback helps site administrators in quality assurance of their pages, contents and theme. But website visitors and users are not expected to be expert in field of web development so the textual feedback provided by them might not be enough for the developer to track down the issue.  To solve this problem Feedback Reloaded captures the whole webpage automatically and allow visitors to highlight/blackout and even add a little note to relevant page area.').'</p>';
+      $output .= '<h3>' . t('Features') . '</h3>';
+      $output .= '<dl>';
+      $output .= '<dt>' . t('Highlight') . '</dt>';
+      $output .= '<dd>' . t('This module allows visitors to highlight relevant area in the webpage') . '</dd>';
+      $output .= '<dt>' . t('Blackout') . '</dt>';
+      $output .= '<dd>' . t('Visitor can blackout any personal information that he/she do not want to send in screenshot.').'</dd>';
+      $output .= '<dt>' . t('Add Note') . '</dt>';
+      $output .= '<dd>' . t('A little note can be attached to relevant area with breif describe of problem/suggestion.').'</dd>';
+		  $output .= '<h3>' . t('Getting Started') . '</h3>';
+			$output .= '<p>' . t('A \'Standard\' feedback type is provided by default you can create one or more <a href="@fbtype">Feedback Types</a> like Bug Report, Suggestion and can even attach fields to these types.', array('@fbtype' => 'admin/structure/feedbacks')).'</p>';
+      return $output;
+  }
+}
+
+/**
  * Implements hook_entity_info().
  */
 function feedback_reloaded_entity_info() {
